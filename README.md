@@ -1,69 +1,127 @@
 # csvcli 0.0.1 (WIP)
 ## Description 
-A simple command-line interface to work with CSV files
+A simple command-line interface to work with CSV, excel and parquet files.
 
 ## Common parameters
 
-These parameters are common to all commands
+These options are common to all commands
 
-- `-f, --filepath` TEXT   Path to the CSV file i.e.
-                        '~/Downloads/super_important_data.csv'. 
+- `-f, --filepath` TEXT   Path to the file i.e.
+                        `~/Downloads/super_important_data.csv`. 
   
-- `-d, --delimiter` TEXT  Delimiter of the CSV file i.e. ','. Must be a
-                        1-character string.
+- `-d, --delimiter` TEXT  Delimiter of the CSV file i.e. `;`. Must be a
+                        1-character string. (optional, default ',')
   
 - `--help`                Show the help message.
 
+
+## Enhanced navigation with `less`
+
+It is strongly encouraged to pipe the output of any command of `csvcli` to `less -S`. 
+This will ensure that you can: 
+- Visualize correctly the contents of the entire file regardless of its dimensions
+  
+- Navigate through the file using the arrow keys to scroll left/right and up/down
+
+- Search for string patterns using `/pattern`
+  - While in search use `n` go to the next line of the file containing the pattern
+  - While in search use `N` go to the previous line of the file containing the pattern
+  
+- Quickly go to the beginning of the file using `g`
+- Quickly go to the end of the file using `G`
+
+For all these reasons all the examples provided here will include piping to `less -S`.
+
+Full documentation on less: https://man7.org/linux/man-pages/man1/less.1.html
+  
+    
+
 ## Currently implemented commands
 
-- show: displays the contents of the CSV file
-  ```
-  csvcli -f "/Users/ignacio/Downloads/sc_converted.csv" -d "," show
-  ```
-  It is strongly recommended to pipe the output to `less -S`. 
-  This will allow to visualize correctly the contents of the entire CSV file regardless of its dimensions and to navigate through it using the arrow keys to scroll left and right. This applies also to the rest of commands.
-    
-  ```
-  csvcli -f "/Users/ignacio/Downloads/sc_converted.csv" -d "," show | less -S
-  ```
-- head: displays only the first 5 rows of the CSV file
+- show: displays the contents of the CSV, excel or parquet file
   
-  ```
-  csvcli -f "/Users/ignacio/Downloads/sc_converted.csv" -d "," head
-  ```
-- nhead: displays only the first n rows of the CSV file
+  Example showing the contents of a CSV file with `,` as a delimiter:
 
-  Parameters
-  - `-n, --rowcount` INTEGER  Number of rows to show
-  
   ```
-  csvcli -f "/Users/ignacio/Downloads/sc_converted.csv" -d "," nhead 7
+  csvcli "/Users/ignacio/Downloads/csv_with_commas.csv" show | less -S
   ```
 
-- cols: displays the column names and data types of the CSV file
+  Example showing the contents of a CSV file with a delimiter other than commas. In this case you must specify the delimiter using the `-d` option:
+
+  ```
+  csvcli "/Users/ignacio/Downloads/csv_with_pipes.csv" -d '|' show | less -S
+  ```
+
+- head: displays only the first n rows of the CSV file (default 5 rows)
+
+  Options:
+  - `-n, --rowcount` INTEGER  Number of rows to show (optional)
+  
+  Example showing only the first 5 rows of the file:
   
   ```
-  csvcli -f "/Users/ignacio/Downloads/sc_converted.csv" -d "," cols
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" head | less -S
   ```
+  Example showing a custom number of rows. In this case you must specify the delimiter using the `-n` option:
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" head -n 100 | less -S
+  ```
+
+- columns: displays the column names and data types of the file
+  
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" columns | less -S
+  ```
+
+- select: allows you to display only a subset of columns. Also supports sorting by a given column.
+
+  Options:
+  - `-c, --columns` TEXT         Names of columns to show separated by commas
+  - `-s, --sort_by` TEXT         Name of column to order by (optional)
+  - `-asc, --ascending` BOOLEAN  bool True for ascending and False for descending (optional)
+  
+  Example selecting 3 given columns from a CSV file:
+
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" select -c "url, clicks, impressions" | less -S
+  ```
+  
+  Example selecting 3 given columns and sorting by one. In this case you must specify the column you want to sort by using the `-s` option. The default ordering is descending:
+
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" select -c "url, clicks, impressions" -s "clicks" | less -S
+  ```
+  
+  Example selecting 3 given columns and sorting by one with ascending order. In this case you must specify that you want ascending order using the `-asc` option with a value of `True`:
+
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" select -c "url, clicks, impressions" -s "clicks" -asc True | less -S
+  ```
+
 - describe: displays a table with summary statistics
   
   ```
-  csvcli -f "/Users/ignacio/Downloads/sc_converted.csv" -d "," describe
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" describe | less -S
   ```
-- nullcols: displays how many null values are per column
+- null-counts: displays how many null values are per column
   
   ```
-  csvcli -f "/Users/ignacio/Downloads/sc_converted.csv" -d "," nullcols
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" null-counts
   ```
 - change-delimiter: changes the delimiter of the CSV file
 
-  Parameters:
+  Options:
     - `-D, --new_delimiter` TEXT  Output CSV delimiter i.e. ';'. Must be a
                             1-character string.
+      
+  Example changing the delimiter of a CSV file separated by commas. You must indicate the desired new delimiter using the `-D` option:
 
   ```
-  csvcli -f "/Users/ignacio/Downloads/sc_converted.csv" -d "," change-delimiter -D "|"
+  csvcli -f "/Users/ignacio/Downloads/file.csv" change-delimiter -D "|"
+  ```
+  Example changing the delimiter of a CSV file with a delimiter other than commas. In this case you must also specify the old delimiter using the `-d` option:
+  ```
+  csvcli -f "/Users/ignacio/Downloads/file.csv" -d ";" change-delimiter -D "|"
   ```
 
-
-
+  In both cases you will get a message confirming the change and your original file will be overwritten.

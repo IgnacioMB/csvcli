@@ -6,6 +6,7 @@ class CommonContext:
     def __init__(self, filepath, delimiter):
         self.filepath = filepath
         self.delimiter = delimiter
+        self.df = read_file_to_df(filepath=filepath, delimiter=delimiter)
 
 
 @click.group()
@@ -34,38 +35,48 @@ def change_delimiter(common_ctx, new_delimiter):
 @cli.command()
 @click.pass_context
 def show(common_ctx):
-    display_table(filepath=common_ctx.obj.filepath, delimiter=common_ctx.obj.delimiter)
-
-
-@cli.command()
-@click.pass_context
-def head(common_ctx):
-    display_table(filepath=common_ctx.obj.filepath, delimiter=common_ctx.obj.delimiter, head=True)
+    display_df(df=common_ctx.obj.df)
 
 
 @cli.command()
 @click.pass_context
 @click.option("-n", "--rowcount", type=int, help="Number of rows to show")
-def nhead(common_ctx, rowcount):
-    display_table(filepath=common_ctx.obj.filepath, delimiter=common_ctx.obj.delimiter, head=True, n=rowcount)
+def head(common_ctx, rowcount):
+
+    common_ctx.obj.df = filter_df(df=common_ctx.obj.df, head=True, n=rowcount).copy()
+    display_df(df=common_ctx.obj.df)
 
 
 @cli.command()
 @click.pass_context
-def cols(common_ctx):
-    display_columns(filepath=common_ctx.obj.filepath, delimiter=common_ctx.obj.delimiter)
+def columns(common_ctx):
+
+    display_df(get_column_names(df=common_ctx.obj.df))
 
 
 @cli.command()
 @click.pass_context
 def describe(common_ctx):
-    display_summary_stats(filepath=common_ctx.obj.filepath, delimiter=common_ctx.obj.delimiter)
+    display_df(get_summary_stats(df=common_ctx.obj.df))
 
 
 @cli.command()
 @click.pass_context
-def nullcols(common_ctx):
-    display_null_columns(filepath=common_ctx.obj.filepath, delimiter=common_ctx.obj.delimiter)
+def null_counts(common_ctx):
+    display_df(get_null_columns(df=common_ctx.obj.df))
+
+
+@cli.command()
+@click.pass_context
+@click.option("-c", "--columns", type=str, help="Names of columns to show separated by commas")
+@click.option("-s", "--sort_by", type=str, help="Name of column to order by")
+@click.option("-asc", "--ascending", type=bool, help="bool True for ascending and False for descending")
+def select(common_ctx, columns, sort_by, ascending):
+
+    common_ctx.obj.df = filter_df(df=common_ctx.obj.df, columns=columns, sort_by=sort_by, ascending=ascending).copy()
+    display_df(df=common_ctx.obj.df)
+
+
 
 
 
