@@ -3,6 +3,7 @@ import pandas as pd
 import sys
 from tabulate import tabulate
 import click
+import pandasql as psql
 
 
 def assert_param(param, **kwargs):
@@ -293,5 +294,14 @@ def get_null_columns(df):
     null_df = df.isna().sum().reset_index().rename(columns={'index': 'column_name', 0: 'count_of_nulls'})
 
     return null_df
+
+
+def filter_df_by_query(df, query):
+
+    file = df.copy()
+
+    result_df = psql.sqldf(query, {**locals(), **globals()})
+
+    return result_df
 
 

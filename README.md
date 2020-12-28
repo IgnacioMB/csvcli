@@ -97,13 +97,36 @@ Full documentation on less: https://man7.org/linux/man-pages/man1/less.1.html
   ```
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" select -c "url, clicks, impressions" -s "clicks" -asc True | less -S
   ```
+  
+- query: allows you to query the CSV, excel or parquet file using SQL queries as you would any regular SQL table. You specify the query using the `-q` option and use the keyword `file` to refer to your file as a source table.
+  
+  Options:
+  - `-q, --query` TEXT  SQL query you want to run against the file i.e. `SELECT * FROM file;`
 
-- describe: displays a table with summary statistics
+  Example selecting all the rows and columns from a CSV file:
+
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" query -q "SELECT * FROM file;" | less -S
+  ```
+  
+  Example selecting a subset of rows from a CSV file:
+
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" query -q "SELECT Region,Units FROM file;" | less -S
+  ```
+  
+  Example running a GROUP BY query on a CSV file:
+
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;" | less -S
+  ```
+
+- describe: displays a table with summary statistics of the numerical columns
   
   ```
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" describe | less -S
   ```
-- null-counts: displays how many null values are per column
+- null-counts: displays the counts of null values are per column
   
   ```
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" null-counts
@@ -124,4 +147,4 @@ Full documentation on less: https://man7.org/linux/man-pages/man1/less.1.html
   csvcli -f "/Users/ignacio/Downloads/file.csv" -d ";" change-delimiter -D "|"
   ```
 
-  In both cases you will get a message confirming the change and your original file will be overwritten.
+  In both cases you will get a message confirming the change, and your original file will be overwritten.

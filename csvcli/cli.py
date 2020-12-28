@@ -6,12 +6,13 @@ class CommonContext:
     def __init__(self, filepath, delimiter):
         self.filepath = filepath
         self.delimiter = delimiter
-        self.df = read_file_to_df(filepath=filepath, delimiter=delimiter)
+        if filepath is not None:
+            self.df = read_file_to_df(filepath=filepath, delimiter=delimiter)
 
 
 @click.group()
 @click.pass_context
-@click.option("-f", "--filepath", type=str, help="Path to the CSV file i.e. '~/Downloads/super_important_data.csv'.")
+@click.option("-f", "--filepath", type=str, help="Path to the file i.e. '~/Downloads/super_important_data.csv'.")
 @click.option("-d", "--delimiter", type=str, help="Delimiter of the CSV file i.e. ','. Must be a 1-character string.")
 def cli(common_ctx, filepath, delimiter):
     """Welcome to csvcli, a simple command-line interface to work with CSV files!"""
@@ -77,10 +78,9 @@ def select(common_ctx, columns, sort_by, ascending):
     display_df(df=common_ctx.obj.df)
 
 
-
-
-
-
-
-
-
+@cli.command()
+@click.pass_context
+@click.option("-q", "--query", type=str, help="SQL query you want to run against the file")
+def query(common_ctx, query):
+    common_ctx.obj.df = filter_df_by_query(df=common_ctx.obj.df, query=query).copy()
+    display_df(df=common_ctx.obj.df)
