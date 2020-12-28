@@ -84,3 +84,10 @@ def select(common_ctx, columns, sort_by, ascending):
 def query(common_ctx, query):
     common_ctx.obj.df = filter_df_by_query(df=common_ctx.obj.df, query=query).copy()
     display_df(df=common_ctx.obj.df)
+
+
+@cli.command()
+@click.pass_context
+@click.option("-c", "--column", type=str, help="Name of column to count the unique values for")
+def value_counts(common_ctx, column):
+    display_df(get_value_counts(df=common_ctx.obj.df, column=column))

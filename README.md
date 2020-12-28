@@ -1,8 +1,8 @@
 # csvcli 0.0.1 (WIP)
 ## Description 
 A simple command-line interface to work with CSV, excel and parquet files. You can use it to:
-- navigate through the contents of your tabular data fast and with a human-friendly format directly on the shell
-- quickly see which columns, data-types are inside
+- navigate through the full contents of your tabular data fast and with a human-friendly format directly on the shell
+- quickly see which columns, data-types are in the file and how many null values or unique values are per column
 - select subsets of the tabular data and even run SQL queries on it
 
 ## Common parameters
@@ -129,11 +129,23 @@ Full documentation on less: https://man7.org/linux/man-pages/man1/less.1.html
   ```
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" describe | less -S
   ```
-- null-counts: displays the counts of null values are per column
+- null-counts: displays the counts of null values per column
   
   ```
-  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" null-counts
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" null-counts | less -S
   ```
+  
+- value-counts: displays the unique values in a column with their respective counts. You must indicate a column using the `-c` option
+
+  Options:
+  - `-c, --column` TEXT  Name of column to count the unique values for
+  
+  Example 
+  
+  ```
+  csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" value-counts -c "Region" | less -S
+  ```
+
 - change-delimiter: changes the delimiter of the CSV file
 
   Options:

@@ -305,3 +305,11 @@ def filter_df_by_query(df, query):
     return result_df
 
 
+def get_value_counts(df, column):
+
+    result = pd.DataFrame(df[column].value_counts()).reset_index()
+    result.rename(columns={'index': 'unique_value', column: f'count'}, inplace=True)
+
+    return result
+
+
