@@ -1,8 +1,0 @@
-click
-pandas
-pyarrow
-fastparquet
-tabulate
-pandasql
-xlrd
-openpyxl
