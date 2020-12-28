@@ -1,6 +1,9 @@
 # csvcli 0.0.1 (WIP)
 ## Description 
-A simple command-line interface to work with CSV, excel and parquet files.
+A simple command-line interface to work with CSV, excel and parquet files. You can use it to:
+- navigate through the contents of your tabular data fast and with a human-friendly format directly on the shell
+- quickly see which columns, data-types are inside
+- select subsets of the tabular data and even run SQL queries on it
 
 ## Common parameters
 
