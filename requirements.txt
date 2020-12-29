@@ -6,3 +6,4 @@ tabulate
 pandasql
 xlrd
 openpyxl
+numpy

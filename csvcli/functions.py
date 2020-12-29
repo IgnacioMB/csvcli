@@ -4,6 +4,7 @@ import sys
 from tabulate import tabulate
 import click
 import pandasql as psql
+import numpy
 
 
 def assert_param(param, **kwargs):
@@ -296,9 +297,28 @@ def get_null_columns(df):
     return null_df
 
 
+def get_df_casted_to_supported_types(df):
+
+    # pandasql uses SQLite syntax
+    # SQLite does not support arrays
+    # In order to not have the query crash whenever an array is in the query result we need to cast arrays into strings
+
+    not_supported_types = [numpy.ndarray, list, tuple, set]
+
+    bad_columns = []
+    for col in df.columns:
+        if type(df[col].values[0]) in not_supported_types:
+            bad_columns.append(col)
+
+    for col in bad_columns:
+        df[col] = df[col].astype(str)
+
+    return df
+
+
 def filter_df_by_query(df, query):
 
-    file = df.copy()
+    file = get_df_casted_to_supported_types(df)
 
     result_df = psql.sqldf(query, {**locals(), **globals()})
 
