@@ -52,7 +52,7 @@ def head(common_ctx, rowcount):
 @click.pass_context
 def columns(common_ctx):
 
-    display_df(get_column_names(df=common_ctx.obj.df))
+    display_df(get_dtypes(df=common_ctx.obj.df, pretty=True))
 
 
 @cli.command()

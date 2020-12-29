@@ -278,11 +278,26 @@ def display_df(df):
     click.echo(pd_tabulate(df))
 
 
-def get_column_names(df):
+def get_dtype(series, pretty=False):
+    series = series[series.notna()].copy()
 
-    cols_df = pd.DataFrame(df.dtypes).reset_index().rename(columns={'index': 'column_name', 0: 'dtype'})
+    if series.shape[0] > 0:
 
-    return cols_df
+        if pretty:
+            return type(series.head(1).values[0]).__name__
+
+        else:
+            return type(series.head(1).values[0])
+
+    else:
+        return None
+
+
+def get_dtypes(df, pretty=False):
+
+    type_dict_list = [{"column_name": col, 'data_type': get_dtype(df[col], pretty)} for col in df.columns]
+
+    return pd.DataFrame(type_dict_list)
 
 
 def get_summary_stats(df):
@@ -305,10 +320,7 @@ def get_df_casted_to_supported_types(df):
 
     not_supported_types = [numpy.ndarray, list, tuple, set]
 
-    bad_columns = []
-    for col in df.columns:
-        if type(df[col].values[0]) in not_supported_types:
-            bad_columns.append(col)
+    bad_columns = [col for col in df.columns if get_dtype(df[col]) in not_supported_types]
 
     for col in bad_columns:
         df[col] = df[col].astype(str)
