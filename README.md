@@ -1,4 +1,13 @@
-# csvcli 0.0.1
+```
+                                                                        ___           
+                                                                       /\_ \    __    
+                                    ___    ____  __  __             ___\//\ \  /\_\   
+                                   /'___\ /',__\/\ \/\ \  _______  /'___\\ \ \ \/\ \  
+                                  /\ \__//\__, `\ \ \_/ |/\______\/\ \__/ \_\ \_\ \ \ 
+                                  \ \____\/\____/\ \___/ \/______/\ \____\/\____\\ \_\
+                                   \/____/\/___/  \/__/            \/____/\/____/ \/_/
+ 
+```
 ## Description 
 A simple command-line interface to work with CSV, excel and parquet files. You can use it to:
 - Explore your data: 
@@ -201,7 +210,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" select -c "url, clicks, impressions" -s "clicks" -asc True | less -S
   ```
   
-  Example saving a selection into an output file. In this case you need to indicate that you want to save and where by using the option `-save`:
+  Example saving a selection result into an output file. In this case you need to indicate that you want to save and where by using the option `-save`:
 
   ```
   csvcli -f "impressions.csv" select -c "region_id, count" -save "subset.csv"
@@ -233,7 +242,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;" | less -S
   ```
   
-  Example saving a query into an output file. In this case you need to indicate that you want to save and where by using the option `-save`:
+  Example saving a query result into an output file. In this case you need to indicate that you want to save and where by using the option `-save`:
 
   ```
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" query -q "SELECT Region,Units FROM file;" -save "query.csv"
