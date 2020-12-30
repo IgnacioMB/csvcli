@@ -93,7 +93,7 @@ Full documentation on less: https://man7.org/linux/man-pages/man1/less.1.html
 
 These commands allow you to quickly get a sense of what the contents of the file look like.
 
-- show: displays the contents of the CSV, excel or parquet file
+- `show`: displays the contents of the CSV, excel or parquet file
   
   Example showing the contents of a CSV file with `,` as a delimiter:
 
@@ -107,7 +107,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   csvcli "/Users/ignacio/Downloads/csv_with_pipes.csv" -d '|' show | less -S
   ```
 
-- head: displays only the first n rows of the CSV file (default 5 rows)
+- `head`: displays only the first n rows of the CSV file (default 5 rows)
 
   Options:
   - `-n, --rowcount` INTEGER  Number of rows to show (optional)
@@ -122,24 +122,24 @@ These commands allow you to quickly get a sense of what the contents of the file
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" head -n 100 | less -S
   ```
 
-- columns: displays the column names and data types of the file
+- `columns`: displays the column names and data types of the file
   
   ```
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" columns | less -S
   ```
   
-- describe: displays a table with summary statistics of the numerical columns
+- `describe`: displays a table with summary statistics of the numerical columns
   
   ```
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" describe | less -S
   ```
-- null-counts: displays the counts of null values per column
+- `null-counts`: displays the counts of null values per column
   
   ```
   csvcli -f "/Users/ignacio/Downloads/csv_with_commas.csv" null-counts | less -S
   ```
   
-- value-counts: displays the unique values in a column with their respective counts. You must indicate a column using the `-c` option
+- `value-counts`: displays the unique values in a column with their respective counts. You must indicate a column using the `-c` option
 
   Options:
   - `-c, --column` TEXT  Name of column to count the unique values for
@@ -182,7 +182,7 @@ These commands allow you to quickly get a sense of what the contents of the file
 
 ```
 
-- select: allows you to display only a subset of columns. Also supports sorting by a given column.
+- `select`: allows you to display only a subset of columns. Also supports sorting by a given column.
 
   Options:
   - `-c, --columns` TEXT         Names of columns to show separated by commas
@@ -216,7 +216,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   csvcli -f "impressions.csv" select -c "region_id, count" -save "subset.csv"
   ```
   
-- query: If you need more advanced filters and functions, the query command allows you to query the CSV, excel or parquet file using SQL queries as you would any regular SQL table. You specify the query using the `-q` option and use the keyword `file` to refer to your file as a source table.
+- `query`: If you need more advanced filters and functions, the query command allows you to query the CSV, excel or parquet file using SQL queries as you would any regular SQL table. You specify the query using the `-q` option and use the keyword `file` to refer to your file as a source table.
   
   Options:
   - `-q, --query` TEXT  SQL query you want to run against the file i.e. `SELECT * FROM file;`
@@ -280,7 +280,7 @@ These commands allow you to quickly get a sense of what the contents of the file
 ```
 
 
-- convert: allows you to convert from and to CSV, excel and parquet in any combination
+- `convert`: allows you to convert from and to CSV, excel and parquet in any combination
 
  Options:
   - `-to, --format` TEXT    Output format. Options: 'csv', 'excel' or 'parquet'
@@ -300,7 +300,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   ```
 
 
-- change-delimiter: changes the delimiter of the CSV file
+- `change-delimiter`: changes the delimiter of the CSV file
 
   Options:
     - `-D, --new_delimiter` TEXT  Output CSV delimiter i.e. ';'. Must be a
@@ -320,6 +320,6 @@ These commands allow you to quickly get a sense of what the contents of the file
 
 ## Note about the author
 
-Ignacio Marin is a self-taught Data Analyst based in Munich, Germany.
+Ignacio Marin is a Data Analyst based in Munich, Germany.
 
 More info on https://www.linkedin.com/in/ignaciomarinb/
