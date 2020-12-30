@@ -8,222 +8,104 @@ import numpy
 from pandasql.sqldf import PandaSQLException
 
 
+def get_filename(filepath):
+    return os.path.splitext(filepath)[0]
+
+
+def get_file_extension(filepath):
+    return os.path.splitext(filepath)[1]
+
+
 def assert_param(param, **kwargs):
     assert param in kwargs.keys(), f"Missing param: {param}!"
 
 
-def get_full_local_path(local_directory, filename):
-
-    # generate full path to file depending on ending char of local_directory
-    if local_directory[-1] != "/":
-        full_local_path = local_directory + "/" + filename
-    else:
-        full_local_path = local_directory + filename
-
-    return full_local_path
-
-
-def check_local_dir_and_file(original_function):
+def check_path(original_function):
     def wrapper(*args, **kwargs):
 
-        assert_param('local_directory', **kwargs)
-        assert_param('filename', **kwargs)
+        assert_param('filepath', **kwargs)
 
-        # check if directory exists
-        if os.path.exists(kwargs['local_directory']):
-            full_local_path = get_full_local_path(kwargs['local_directory'], kwargs['filename'])
-
-            # check if file exists within directory
-            if os.path.exists(full_local_path):
-                original_function(*args, **kwargs)
-
-            else:
-                print(f"\nOuch! There is no file called '{kwargs['filename']}' in {kwargs['local_directory']}")
-
+        # check if filepath exists
+        if os.path.exists(kwargs['filepath']):
+            return original_function(*args, **kwargs)
         else:
-            print(f"\nOuch! This local directory does not exist {kwargs['local_directory']}")
+            print(f"\nOuch! Could not find '{kwargs['filepath']}'")
+            sys.exit(0)
 
     return wrapper
 
 
-def validate_delimiter(csv_delimiter):
-    if not isinstance(csv_delimiter, str):
+def validate_delimiter(delimiter):
+    if not isinstance(delimiter, str):
         print("\nError! CSV delimiter must be a string")
         sys.exit()
 
-    if not len(csv_delimiter) == 1:
+    if not len(delimiter) == 1:
         print("\nError! CSV delimiter must be a 1-character string")
         sys.exit()
 
 
-@check_local_dir_and_file
-def local_delimiter_change(*args, **kwargs):
+def get_filepath_without_extension(filepath):
+    current_file_ext = get_file_extension(filepath=filepath)
+    return filepath[:-len(current_file_ext)]
+
+
+def get_new_filepath(filepath, desired_format):
+
+    filepath_wo_ext = get_filepath_without_extension(filepath=filepath)
+
+    if desired_format == 'csv':
+        return filepath_wo_ext + ".csv"
+
+    elif desired_format == 'excel':
+        return filepath_wo_ext + ".xlsx"
+
+    elif desired_format == 'parquet':
+        return filepath_wo_ext + ".parquet"
+
+    else:
+        print("Ouch! Invalid format choice. You need to choose between 'csv', 'excel' or 'parquet'.")
+
+
+def output_to_file(*args, **kwargs):
     """
-    Changes the delimiter of a local file
-    :param filename: name of the file example 'myfile.csv'
-    :param local_directory: path to the directory where the file is stored example '/Users/john/Downloads/mydir'
-    :param old_delimiter: example ','
-    :param new_delimiter: example ';'
+    Outputs a DataFrame in the desired format
+    :param df: Pandas DataFrame
+    :param filepath: path where the output file will be stored example '/Users/john/Downloads/mydir/myfile.csv'
+    :param delimiter: (optional) csv delimiter if you want to output in csv with other than comma
+    :param desired_format: has to be 'csv', 'excel' or 'parquet'
     :return:
     ------------------------------------------------------------------------
     Code sample
     ------------------------------------------------------------------------
-    local_delimiter_change(filename='Seo_Pages_Data_(2020-12-19).csv',
-                           local_directory='/Users/john/Downloads',
-                           old_delimiter=';', new_delimiter='|')
+    format_change(filepath='/Users/john/Downloads/mydir/myfile.csv',
+                  delimiter=';',
+                  desired_format='excel')
     """
 
-    assert_param('filename', **kwargs)
-    assert_param('local_directory', **kwargs)
-    assert_param('old_delimiter', **kwargs)
-    assert_param('new_delimiter', **kwargs)
+    assert_param('df', **kwargs)
+    assert_param('filepath', **kwargs)
+    assert_param('desired_format', **kwargs)
 
-    validate_delimiter(kwargs['old_delimiter'])
-    validate_delimiter(kwargs['new_delimiter'])
-
-
-    # read original csv
-    full_local_path = get_full_local_path(kwargs['local_directory'], kwargs['filename'])
-    df = pd.read_csv(full_local_path, sep=kwargs['old_delimiter'])
-
-    # overwrite with new delimiter
-    df.to_csv(full_local_path, sep=kwargs['new_delimiter'], index=False)
-
-    print(f"successfully changed delimiter of '{full_local_path}' from '{kwargs['old_delimiter']}' to '{kwargs['new_delimiter']}'")
-
-
-def get_parquet_filename(filename):
-    return filename[:-4] + ".parquet"
-
-
-@check_local_dir_and_file
-def local_csv_to_parquet(*args, **kwargs):
-    """
-    Transforms a local CSV file to parquet
-    :param filename: name of the file example 'myfile.csv'
-    :param local_directory: path to the directory where the file is stored example '/Users/john/Downloads/mydir'
-    :param csv_delimiter: example ';'
-    :param keep_original: boolean to indicate if you want to keep the original file, if False you delete the csv
-    :return:
-    ------------------------------------------------------------------------
-    Code sample
-    ------------------------------------------------------------------------
-    local_csv_to_parquet(filename='bookings.csv',
-                         local_directory='/Users/john/Downloads/bookings',
-                         keep_original=True,
-                         csv_transform=';')
-    """
-
-    assert_param('filename', **kwargs)
-    assert_param('local_directory', **kwargs)
-    assert_param('csv_transform', **kwargs)
-    assert_param('keep_original', **kwargs)
-
-    print(f"convert: {kwargs['filename']} to parquet...")
-
-    # read original csv
-    csv_full_local_path = get_full_local_path(kwargs['local_directory'], kwargs['filename'])
-    df = pd.read_csv(csv_full_local_path, sep=kwargs['csv_transform'])
-
-    # write parquet
-    parquet_filename = get_parquet_filename(kwargs['filename'])
-    parquet_full_local_path = get_full_local_path(kwargs['local_directory'], parquet_filename)
-    df.to_parquet(parquet_full_local_path, index=False)
-
-    # delete original if asked for it
-    if not kwargs['keep_original']:
-        os.remove(csv_full_local_path)
-
-
-def get_list_of_csv_files_in_local_directory(local_directory):
-
-    os.system(f"ls -l {local_directory} > files.txt")
-    with open("files.txt", mode='r') as myfile:
-        ls_file = myfile.readlines()
-    file_list = list(map(lambda x: x.split(' ')[-1][:-1], ls_file[1:]))
-    file_list = list(filter(lambda x: x.endswith(".csv"), file_list))
-    os.remove('files.txt')
-
-    return file_list
-
-
-def apply_to_all_csv_files_in_local_dir(original_function):
-
-    """
-    Pre-Requisites:
-        -CSV filenames cannot contain spaces!!
-    """
-
-    def wrapper(*args, **kwargs):
-
-        assert_param('local_directory', **kwargs)
-
-        if os.path.exists(kwargs['local_directory']):
-
-            # generate list of all CSV files in directory
-            file_list = get_list_of_csv_files_in_local_directory(kwargs['local_directory'])
-
-            print(f"\nTotal number of CSV files in {kwargs['local_directory']}: {len(file_list)}")
-
-            # apply original function to each CSV file
-            i = 1
-            for filename in file_list:
-                print(f"\n({i}/{len(file_list)})")
-                new_kwargs = kwargs.copy()
-                new_kwargs['filename'] = filename
-                original_function(*args, **new_kwargs)
-                i += 1
-
+    if kwargs['desired_format'] == 'csv':
+        if 'delimiter' in kwargs.keys() and kwargs['delimiter'] is not None:
+            kwargs['df'].to_csv(kwargs['filepath'], sep=kwargs['delimiter'], index=False)
         else:
-            print(f"\nOuch! This path does not exist {kwargs['local_directory']}")
+            kwargs['df'].to_csv(kwargs['filepath'], index=False)
 
-    return wrapper
+    elif kwargs['desired_format'] == 'excel':
+        kwargs['df'].to_excel(kwargs['filepath'], index=False)
 
+    elif kwargs['desired_format'] == 'parquet':
+        kwargs['df'].to_parquet(kwargs['filepath'], index=False)
 
-local_change_delimiter_whole_dir = apply_to_all_csv_files_in_local_dir(local_delimiter_change)
-
-local_change_delimiter_whole_dir.__doc__ = """
-Changes the delimiter of all the csv files within the directory indicated by local_directory
-Ignores non-csv files
-Pre-Requisites:
-    -All original CSV files must have the same delimiter
-    -CSV filenames cannot contain spaces!!
-:param local_directory: path to the directory where the files are stored example '/Users/john/Downloads/mydir'
-:param old_delimiter: example ','
-:param new_delimiter: example ';'
-:return:
-------------------------------------------------------------------------
-Code sample
-------------------------------------------------------------------------
-local_change_delimiter_whole_dir(local_directory='/Users/john/Downloads/bookings',
-                                 old_delimiter=',', new_delimiter='|')
-"""
-
-local_csv_to_parquet_whole_dir = apply_to_all_csv_files_in_local_dir(local_csv_to_parquet)
-
-local_csv_to_parquet_whole_dir.__doc__ = """
-    Transforms to parquet all the CSV files within the directory indicated by local_directory
-    Ignores non-csv files
-    Pre-Requisites:
-        -All original CSV files must have the same delimiter
-        -CSV filenames cannot contain spaces!!
-    :param local_directory: path to the directory where the files are stored example '/Users/john/Downloads/mydir'
-    :param keep_original: boolean to indicate if you want to keep the original files, if False you delete the csv files
-    :param csv_transform: example ';'
-    :return:
-    ------------------------------------------------------------------------
-    Code sample
-    ------------------------------------------------------------------------
-    local_csv_to_parquet_whole_dir(keep_original=True, csv_transform=';',
-                                   local_directory='/Users/john/Downloads/bookings')
-    """
+    else:
+        print("Ouch! Invalid format choice. You need to choose between 'csv', 'excel' or 'parquet'.")
 
 
-@check_local_dir_and_file
-def delete_local_file(filename, local_directory):
-    full_local_path = get_full_local_path(local_directory, filename)
-    print(f"delete: {full_local_path}...")
-    os.remove(full_local_path)
+@check_path
+def delete_local_file(filepath):
+    os.remove(filepath)
 
 
 def pd_tabulate(my_df):
@@ -241,15 +123,38 @@ def get_col_list(col_string):
     return col_list
 
 
+def get_format_from_file_extension(file_extension):
+
+    if file_extension == '.csv':
+        format = 'csv'
+
+    elif file_extension == '.parquet':
+        format = 'parquet'
+
+    elif file_extension in ['.xlsx', '.xls']:
+        format = 'excel'
+
+    else:
+        print("Ouch! csvcli can only process CSV, excel and parquet files")
+        sys.exit(0)
+
+    return format
+
+
+@check_path
 def read_file_to_df(filepath, delimiter=','):
 
-    if filepath.endswith('.csv'):
+    file_extension = get_file_extension(filepath=filepath)
+
+    format = get_format_from_file_extension(file_extension=file_extension)
+
+    if format == 'csv':
         df = pd.read_csv(filepath, delimiter=delimiter)
 
-    elif filepath.endswith('.parquet'):
+    elif format == 'parquet':
         df = pd.read_parquet(filepath)
 
-    elif filepath.endswith('.xlsx'):
+    elif format == 'excel':
         df = pd.read_excel(filepath)
 
     return df
