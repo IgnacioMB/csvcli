@@ -319,7 +319,7 @@ def get_df_casted_to_supported_types(df):
     # In order to not have the query crash whenever an array is in the query result we need to cast arrays into strings
     # We also cast dictionaries and dates into str to be on the safe side
 
-    not_supported_types = [numpy.ndarray, list, tuple, set, dict, numpy.datetime]
+    not_supported_types = [numpy.ndarray, list, tuple, set, dict, numpy.datetime64]
 
     bad_columns = [col for col in df.columns if get_dtype(df[col]) in not_supported_types]
 
