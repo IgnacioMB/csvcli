@@ -334,6 +334,9 @@ def filter_df_by_query(df, query):
 
     file = get_df_casted_to_supported_types(df)
 
+    # if the column names contain spaces, convert them to underscores so you can still query them
+    file.columns = [col.replace(' ', '_') for col in file.columns]
+
     try:
         result_df = psql.sqldf(query, {**locals(), **globals()})
 
