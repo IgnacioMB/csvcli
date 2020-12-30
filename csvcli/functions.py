@@ -5,6 +5,7 @@ from tabulate import tabulate
 import click
 import pandasql as psql
 import numpy
+from pandasql.sqldf import PandaSQLException
 
 
 def assert_param(param, **kwargs):
@@ -333,7 +334,16 @@ def filter_df_by_query(df, query):
 
     file = get_df_casted_to_supported_types(df)
 
-    result_df = psql.sqldf(query, {**locals(), **globals()})
+    try:
+        result_df = psql.sqldf(query, {**locals(), **globals()})
+
+    except PandaSQLException as e:
+
+        error = e.__str__().split('\n')[0]
+
+        print(f"Ouch! Your SQL query failed: {error}")
+
+        sys.exit(0)
 
     return result_df
 
