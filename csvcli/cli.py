@@ -6,16 +6,14 @@ class CommonContext:
     def __init__(self, filepath, delimiter):
         self.filepath = filepath
         self.delimiter = delimiter
-
-        if os.path.exists(filepath):
-            self.filename = get_filename(filepath=filepath)
-            self.file_extension = get_file_extension(filepath=filepath)
-            self.df = read_file_to_df(filepath=filepath, delimiter=delimiter)
+        self.filename = get_filename(filepath=filepath)
+        self.file_extension = get_file_extension(filepath=filepath)
+        self.df = read_file_to_df(filepath=filepath, delimiter=delimiter)
 
 
 @click.group()
 @click.pass_context
-@click.argument("filepath", type=str, required=False, default="")
+@click.argument("filepath", type=str, required=True)
 @click.option("-d", "--delimiter", type=str, default=",", help="(optional) Only for CSV files. Delimiter if other than comma i.e. ';'. Must be a 1-character string.")
 def cli(common_ctx, filepath, delimiter):
     """
