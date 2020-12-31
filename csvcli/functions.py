@@ -29,7 +29,7 @@ def check_path(original_function):
         if os.path.exists(kwargs['filepath']):
             return original_function(*args, **kwargs)
         else:
-            print(f"\nOuch! Could not find '{kwargs['filepath']}'")
+            click.echo(f"\nOuch! Could not find '{kwargs['filepath']}'")
             sys.exit(0)
 
     return wrapper
@@ -37,11 +37,17 @@ def check_path(original_function):
 
 def validate_delimiter(delimiter):
     if not isinstance(delimiter, str):
-        print("\nError! CSV delimiter must be a string")
+        click.echo("\nError! CSV delimiter must be a string")
         sys.exit()
 
     if not len(delimiter) == 1:
-        print("\nError! CSV delimiter must be a 1-character string")
+        click.echo("\nError! CSV delimiter must be a 1-character string")
+        sys.exit()
+
+
+def validate_format(format):
+    if not isinstance(format, str) or format not in['csv', 'excel', 'parquet']:
+        click.echo("Ouch! Invalid format choice. You need to choose between 'csv', 'excel' or 'parquet'.")
         sys.exit()
 
 
@@ -51,6 +57,8 @@ def get_filepath_without_extension(filepath):
 
 
 def get_new_filepath(filepath, desired_format):
+
+    validate_format(desired_format)
 
     filepath_wo_ext = get_filepath_without_extension(filepath=filepath)
 
@@ -62,9 +70,6 @@ def get_new_filepath(filepath, desired_format):
 
     elif desired_format == 'parquet':
         return filepath_wo_ext + ".parquet"
-
-    else:
-        print("Ouch! Invalid format choice. You need to choose between 'csv', 'excel' or 'parquet'.")
 
 
 def output_to_file(*args, **kwargs):
@@ -87,6 +92,8 @@ def output_to_file(*args, **kwargs):
     assert_param('filepath', **kwargs)
     assert_param('desired_format', **kwargs)
 
+    validate_format(kwargs['desired_format'])
+
     if kwargs['desired_format'] == 'csv':
         if 'delimiter' in kwargs.keys() and kwargs['delimiter'] is not None:
             kwargs['df'].to_csv(kwargs['filepath'], sep=kwargs['delimiter'], index=False)
@@ -98,9 +105,6 @@ def output_to_file(*args, **kwargs):
 
     elif kwargs['desired_format'] == 'parquet':
         kwargs['df'].to_parquet(kwargs['filepath'], index=False)
-
-    else:
-        print("Ouch! Invalid format choice. You need to choose between 'csv', 'excel' or 'parquet'.")
 
 
 @check_path
@@ -135,7 +139,7 @@ def get_format_from_file_extension(file_extension):
         format = 'excel'
 
     else:
-        print("Ouch! csvcli can only process CSV, excel and parquet files")
+        click.echo("Ouch! csvcli can only process CSV, excel and parquet files")
         sys.exit(0)
 
     return format
@@ -170,7 +174,7 @@ def filter_df(df, head=False, n=None, columns=None, sort_by=None, ascending=True
 
         for col in col_list:
             if col not in output_df.columns:
-                print(f"Ouch! Column '{col}' does not seem to be in your file...")
+                click.echo(f"Ouch! Column '{col}' does not seem to be in your file...")
                 sys.exit(0)
 
         output_df = df[col_list].copy()
@@ -256,7 +260,7 @@ def filter_df_by_query(df, query):
 
         error = e.__str__().split('\n')[0]
 
-        print(f"Ouch! Your SQL query failed: {error}")
+        click.echo(f"Ouch! Your SQL query failed: {error}")
 
         sys.exit(0)
 

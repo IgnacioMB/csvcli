@@ -205,7 +205,7 @@ def select(common_ctx, columns, sort_by, ascending, save_to):
                        filepath=save_to,
                        desired_format=format)
 
-        print(f"successfully wrote select result into {save_to}")
+        click.echo(f"successfully wrote select result into {save_to}")
 
 
 @cli.command()
@@ -248,7 +248,7 @@ def query(common_ctx, query, save_to):
                        filepath=save_to,
                        desired_format=format)
 
-        print(f"successfully wrote query result into {save_to}")
+        click.echo(f"successfully wrote query result into {save_to}")
 
 
 """
@@ -290,10 +290,10 @@ def convert(common_ctx, format, delimiter):
 
         delete_local_file(filepath=common_ctx.obj.filepath)
 
-        print(f"successfully converted {common_ctx.obj.filepath} to '{format}'")
+        click.echo(f"successfully converted {common_ctx.obj.filepath} to '{format}'")
 
     else:
-        print("Ouch! The original formal of the file and the new format you selected are identical")
+        click.echo("Ouch! The original formal of the file and the new format you selected are identical")
 
 
 @cli.command()
@@ -321,7 +321,7 @@ def change_delimiter(common_ctx, new_delimiter):
                        desired_format='csv',
                        delimiter=new_delimiter)
 
-        print(f"successfully changed CSV delimiter of {common_ctx.obj.filepath} to '{new_delimiter}'")
+        click.echo(f"successfully changed CSV delimiter of {common_ctx.obj.filepath} to '{new_delimiter}'")
 
     else:
-        print("Ouch! You can only change delimiter of CSV files")
+        click.echo("Ouch! You can only change delimiter of CSV files")
