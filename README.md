@@ -24,16 +24,19 @@ A simple command-line interface to work with CSV, excel and parquet files. You c
   - You can convert from and to CSV, excel and parquet in any combination
   - You can change the delimiter of your CSV file
 
-## Common parameters
+## Global parameters
 
-These options are common to all commands
+Usage: csvcli [OPTIONS] FILEPATH COMMAND [ARGS]...
 
-  - `-f, --filepath` TEXT   Path to the file i.e. 'myfiles/data.csv'.
+Arguments 
+
+  - `FILEPATH` TEXT   Path to the file i.e. myfiles/data.csv. You might need to wrap it in "" if your filename contains parentheses and such.
+
+Options:
   - `-d, --delimiter` TEXT  (optional) Only for CSV files. Delimiter if other than
                         comma i.e. ';'. Must be a 1-character string.
-
-  - `--help`                Show this message and exit.
-
+  
+  - `--help `               Show this message and exit.
 
 
 ## Enhanced navigation with `less`
@@ -94,16 +97,18 @@ These commands allow you to quickly get a sense of what the contents of the file
 
 - `show`: Displays the contents of the CSV, excel or parquet file
   
-  Example showing the contents of a CSV file with `,` as a delimiter. You indicate the file you want to open using the `-f` option:
+  Example showing the contents of a CSV file with `,` as a delimiter. 
+  You indicate the file you want to open using the `-f` option:
 
   ```
-  csvcli -f "myfiles/data.csv" show | less -S
+  csvcli myfiles/data.csv show | less -S
   ```
 
-  Example showing the contents of a CSV file with a delimiter other than commas. In this case you must specify the delimiter using the `-d` option:
+  Example showing the contents of a CSV file with a delimiter other than commas. 
+  In this case you must specify the delimiter using the `-d` option:
 
   ```
-  csvcli -f "myfiles/csv_with_pipes.csv" -d '|' show | less -S
+  csvcli -d '|' myfiles/csv_with_pipes.csv show | less -S
   ```
 
 - `head`: Displays only the first rows of the file
@@ -114,31 +119,32 @@ These commands allow you to quickly get a sense of what the contents of the file
   If you do not indicate any number, it returns the first 5 rows of the file:
   
   ```
-  csvcli -f "myfiles/data.csv" head | less -S
+  csvcli myfiles/data.csv head | less -S
   ```
   You can specify a custom number of rows to show using the `-n` option:
   ```
-  csvcli -f "myfiles/data.csv" head -n 100 | less -S
+  csvcli myfiles/data.csv head -n 100 | less -S
   ```
 
 - `columns`: Displays the column names and data types of the file
   
   ```
-  csvcli -f "myfiles/data.csv" columns | less -S
+  csvcli myfiles/data.csv columns | less -S
   ```
   
 - `describe`: Displays a table with summary statistics of the numerical columns
   
   ```
-  csvcli -f "myfiles/data.csv" describe | less -S
+  csvcli myfiles/data.csv describe | less -S
   ```
 - `null-counts`: Displays the counts of null values per column
   
   ```
-  csvcli -f "myfiles/data.csv" null-counts | less -S
+  csvcli myfiles/data.csv null-counts | less -S
   ```
   
-- `value-counts`: Displays the unique values in a column with their respective counts. You must indicate a column using the `-c` option
+- `value-counts`: Displays the unique values in a column with their respective counts. 
+  You must indicate a column using the `-c` option
 
   Options:
   - `-c, --column` TEXT  Name of column to count the unique values for
@@ -146,7 +152,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   Example 
   
   ```
-  csvcli -f "myfiles/data.csv" value-counts -c "Region" | less -S
+  csvcli myfiles/data.csv value-counts -c "Region" | less -S
   ```
 
   
@@ -181,7 +187,8 @@ These commands allow you to quickly get a sense of what the contents of the file
 
 ```
 
-- `select`: Allows you to display only a subset of columns. Also supports sorting by a given column.
+- `select`: Allows you to display only a subset of columns. 
+  Also supports sorting by a given column.
 
    Options:
    - `-c, --columns` TEXT         Names of columns to show separated by commas
@@ -195,28 +202,25 @@ These commands allow you to quickly get a sense of what the contents of the file
    Example selecting columns from a CSV file:
 
    ```  
-   csvcli -f "myfiles/data.csv" select -c "url, clicks, impressions" | less -S
+   csvcli myfiles/data.csv select -c "url, clicks, impressions" | less -S
    ```    
   
-   Example selecting columns and sorting by one using the `-s` option. The default order is descending:
+   Example selecting columns and sorting by one using the `-s` option. 
+   You can add `ASC` for ascending order or `DESC` for descending order.
+   The default is ascending:
    
    ```    
-   csvcli -f "myfiles/data.csv" select -c "url, clicks, impressions" -s "clicks" | less -S
-   ```    
-  
-   Example selecting columns and sorting by one with ascending order using the `-asc` option:
-    
+   csvcli myfiles/data.csv select -c "url, clicks, impressions" -s "clicks" DESC | less -S
    ```
-   csvcli -f "myfiles/data.csv" select -c "url, clicks, impressions" -s "clicks" -asc True | less -S
-   ```    
     
    Example saving a selection result into an output file using the option `-save`:
     
    ``` 
-   csvcli -f "myfiles/data.csv" select -c "region, count" -save "subset.csv"
+   csvcli myfiles/data.csv select -c "region, count" -save "subset.csv"
    ```
     
-- `query`: If you need more advanced filters and functions, the query command allows you to query the CSV, excel or parquet file using SQL queries as you would any regular SQL table. You specify the query using the `-q` option and use the keyword `file` to refer to your file as a source table.
+- `query`: If you need more advanced filters and functions, the query command allows you to query the CSV, excel or parquet file using SQL queries as you would any regular SQL table. 
+  You specify the query using the `-q` option and use the keyword `file` to refer to your file as a source table.
   
   Options:
   - `-q, --query` TEXT  SQL query you want to run against the file i.e. `SELECT * FROM file;`
@@ -227,13 +231,13 @@ These commands allow you to quickly get a sense of what the contents of the file
   Example running a query on a CSV file:
 
   ```
-  csvcli -f "myfiles/data.csv" query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;" | less -S
+  csvcli myfiles/data.csv query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;" | less -S
   ```
   
   Example saving a query result into an output file using the option `-save`:
 
   ```
-  csvcli -f "myfiles/data.csv" query -q "SELECT Region,Units FROM file;" -save "query.csv"
+  csvcli myfiles/data.csv query -q "SELECT Region,Units FROM file;" -save "query.csv"
   ```
 
 ```
@@ -268,7 +272,8 @@ These commands allow you to quickly get a sense of what the contents of the file
 ```
 
 
-- `convert`: Allows you to convert from and to CSV, excel and parquet in any combination. Your original file will be overwritten.
+- `convert`: Allows you to convert from and to CSV, excel and parquet in any combination. 
+  Your original file will be overwritten.
 
  Options:
   - `-to, --format` TEXT    Output format. Options: 'csv', 'excel' or 'parquet'
@@ -278,17 +283,18 @@ These commands allow you to quickly get a sense of what the contents of the file
   Example converting a parquet file to CSV:
 
   ```
-  csvcli -f "myfiles/data.parquet" convert -to "csv"
+  csvcli myfiles/data.parquet convert -to "csv"
   ```
 
   Example converting an excel file to CSV with `|` as delimiter. using the `-D` option:
 
   ```
-  csvcli -f "myfiles/data.xlsx" convert -to "csv" -D "|"
+  csvcli myfiles/data.xlsx convert -to "csv" -D "|"
   ```
 
 
-- `change-delimiter`: Changes the delimiter of a CSV file. Your original file will be overwritten.
+- `change-delimiter`: Changes the delimiter of a CSV file. 
+  Your original file will be overwritten.
 
   Options:
     - `-D, --new_delimiter` TEXT  Output CSV delimiter i.e. ';'. Must be a
@@ -297,11 +303,13 @@ These commands allow you to quickly get a sense of what the contents of the file
   Example changing the delimiter of a CSV file originally delimited by commas using the `-D` option:
 
   ```
-  csvcli -f "data.csv" change-delimiter -D "|"
+  csvcli data.csv change-delimiter -D "|"
   ```
-  Example changing the delimiter of a CSV file with a delimiter other than commas. In this case you must also specify the old delimiter using the `-d` option:
+  
+  Example changing the delimiter of a CSV file with a delimiter other than commas. 
+  In this case you must also specify the old delimiter using the `-d` option:
   ```
-  csvcli -f "/Users/ignacio/Downloads/file.csv" -d ";" change-delimiter -D "|"
+  csvcli -d ";" data.csv change-delimiter -D "|"
   ```
 
 ## Note about the author

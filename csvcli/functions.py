@@ -164,7 +164,13 @@ def read_file_to_df(filepath, delimiter=','):
     return df
 
 
-def filter_df(df, head=False, n=None, columns=None, sort_by=None, ascending=True):
+def assert_col_in_df(df, column):
+    if column not in df.columns:
+        click.echo(f"Ouch! Column '{column}' does not seem to exist...")
+        sys.exit(0)
+
+
+def filter_df(df, head=False, n=None, columns=None, sort_by=None, order='ASC'):
 
     output_df = df.copy()
 
@@ -173,14 +179,19 @@ def filter_df(df, head=False, n=None, columns=None, sort_by=None, ascending=True
         col_list = get_col_list(col_string=columns)
 
         for col in col_list:
-            if col not in output_df.columns:
-                click.echo(f"Ouch! Column '{col}' does not seem to be in your file...")
-                sys.exit(0)
+            assert_col_in_df(df=output_df, column=col)
 
         output_df = df[col_list].copy()
 
     if sort_by is not None:
-        output_df = output_df.sort_values(by=sort_by, ascending=ascending)
+        assert_col_in_df(df=output_df, column=sort_by)
+        if order.lower() in ['asc', 'ascending']:
+            output_df = output_df.sort_values(by=sort_by, ascending=True)
+        elif order.lower() in ['desc', 'descending']:
+            output_df = output_df.sort_values(by=sort_by, ascending=False)
+        else:
+            click.echo("Ouch! Wrong order value, you can choose either ASC for ascending or DESC for descending")
+            sys.exit(0)
 
     if head:
         if n is not None:

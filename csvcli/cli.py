@@ -6,7 +6,8 @@ class CommonContext:
     def __init__(self, filepath, delimiter):
         self.filepath = filepath
         self.delimiter = delimiter
-        if filepath is not None:
+
+        if os.path.exists(filepath):
             self.filename = get_filename(filepath=filepath)
             self.file_extension = get_file_extension(filepath=filepath)
             self.df = read_file_to_df(filepath=filepath, delimiter=delimiter)
@@ -14,7 +15,7 @@ class CommonContext:
 
 @click.group()
 @click.pass_context
-@click.option("-f", "--filepath", type=str, help="Path to the file i.e. 'myfiles/data.csv'.")
+@click.argument("filepath", type=str, required=False, default="")
 @click.option("-d", "--delimiter", type=str, default=",", help="(optional) Only for CSV files. Delimiter if other than comma i.e. ';'. Must be a 1-character string.")
 def cli(common_ctx, filepath, delimiter):
     """
@@ -47,18 +48,17 @@ def show(common_ctx):
 
     Displays the contents of the CSV, excel or parquet file.
 
-    Example showing the contents of a CSV file with `,` as a delimiter.
-    You indicate the file you want to open using the `-f` option:
+    Example showing the contents of a CSV file with the default delimiter:
 
 
-        csvcli -f "csv_with_commas.csv" show | less -S
+        csvcli csv_with_commas.csv show | less -S
 
 
-    Example showing the contents of a CSV file with a delimiter other than commas.
+    Example showing the contents of a CSV file with a custom delimiter.
     In this case you must specify the delimiter using the `-d` option:
 
 
-        csvcli -f "csv_with_pipes.csv" -d '|' show | less -S
+        csvcli -d '|' csv_with_pipes.csv show | less -S
 
     """
 
@@ -75,11 +75,11 @@ def head(common_ctx, rowcount):
 
     If you do not indicate any number, it returns the first 5 rows of the file:
 
-        csvcli -f "csv_with_commas.csv" head | less -S
+        csvcli csv_with_commas.csv head | less -S
 
     You can specify a custom number of rows to show using the `-n` option:
 
-        csvcli -f "csv_with_commas.csv" head -n 100 | less -S
+        csvcli csv_with_commas.csv head -n 100 | less -S
 
     """
     common_ctx.obj.df = filter_df(df=common_ctx.obj.df, head=True, n=rowcount).copy()
@@ -94,7 +94,7 @@ def columns(common_ctx):
     Displays the column names and data types of the file.
 
 
-        csvcli -f "myfiles/data.csv" columns | less -S
+        csvcli myfiles/data.csv columns | less -S
 
     """
     display_df(get_dtypes(df=common_ctx.obj.df, pretty=True))
@@ -108,7 +108,7 @@ def describe(common_ctx):
     Displays a table with summary statistics of the numerical columns.
 
 
-        csvcli -f "myfiles/data.csv" describe | less -S
+        csvcli myfiles/data.csv describe | less -S
 
     """
 
@@ -123,7 +123,7 @@ def null_counts(common_ctx):
     Displays the counts of null values per column.
 
 
-        csvcli -f "myfiles/data.csv" null-counts | less -S
+        csvcli myfiles/data.csv null-counts | less -S
 
     """
     display_df(get_null_columns(df=common_ctx.obj.df))
@@ -140,7 +140,7 @@ def value_counts(common_ctx, column):
 
     Example
 
-        csvcli -f "myfiles/data.csv" value-counts -c "Region" | less -S
+        csvcli myfiles/data.csv value-counts -c "Region" | less -S
 
     """
     display_df(get_value_counts(df=common_ctx.obj.df, column=column))
@@ -151,44 +151,42 @@ FILTER AND QUERY
 """
 
 
-@cli.command()
+@cli.command(no_args_is_help=True)
 @click.pass_context
 @click.option("-c", "--columns", type=str, help="Names of columns to show separated by commas")
 @click.option("-s", "--sort-by", type=str, help="Name of column to sort by")
-@click.option("-asc", "--ascending", type=bool, help="True for ascending and False for descending")
+@click.argument("order", type=str, default="ASC", required=False)
 @click.option("-save", "--save-to", type=str, help="Path to the destination file i.e. 'myfiles/data.csv'. The file extension determines output format")
-def select(common_ctx, columns, sort_by, ascending, save_to):
+def select(common_ctx, columns, sort_by, order, save_to):
 
     """
 
-    Allows you to display only a subset of columns. Also supports sorting by a given column.
+    Allows you to display only a subset of columns.
+    Also supports sorting by a given column.
 
     Example selecting columns from a CSV file:
 
 
-        csvcli -f "myfiles/data.csv" select -c "url, clicks, impressions" | less -S
+        csvcli myfiles/data.csv select -c "url, clicks, impressions" | less -S
 
 
-    Example selecting columns and sorting by one using the `-s` option. The default order is descending:
+    Example selecting columns and sorting by one using the `-s` option.
+    You can add `ASC` for ascending order or `DESC` for descending order.
+    The default is ascending:
 
 
-        csvcli -f "myfiles/data.csv" select -c "url, clicks, impressions" -s "clicks" | less -S
-
-
-    Example selecting columns and sorting by one with ascending order using the `-asc` option:
-
-
-        csvcli -f "myfiles/data.csv" select -c "url, clicks, impressions" -s "clicks" -asc True | less -S
+        csvcli myfiles/data.csv select -c "url, clicks, impressions" -s "clicks" DESC | less -S
 
 
     Example saving a selection result into an output file using the option `-save`:
 
 
-        csvcli -f "myfiles/data.csv" select -c "region, count" -save "subset.csv"
+        csvcli myfiles/data.csv select -c "region, count" -save "subset.csv"
+
 
     """
 
-    common_ctx.obj.df = filter_df(df=common_ctx.obj.df, columns=columns, sort_by=sort_by, ascending=ascending).copy()
+    common_ctx.obj.df = filter_df(df=common_ctx.obj.df, columns=columns, sort_by=sort_by, order=order).copy()
 
     # we show result on screen if not save selected
     if save_to is None:
@@ -221,12 +219,12 @@ def query(common_ctx, query, save_to):
 
     Example running a query on a CSV file:
 
-        csvcli -f "myfiles/data.csv" query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;" | less -S
+        csvcli myfiles/data.csv query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;" | less -S
 
 
     Example saving a query result into an output file using the option `-save`:
 
-        csvcli -f "myfiles/data.csv" query -q "SELECT Region,Units FROM file;" -save "query.csv"
+        csvcli myfiles/data.csv query -q "SELECT Region,Units FROM file;" -save "query.csv"
 
 
     """
@@ -268,13 +266,13 @@ def convert(common_ctx, format, delimiter):
 
     Example converting a parquet file to CSV:
 
-        csvcli -f "myfiles/data.parquet" convert -to "csv"
+        csvcli myfiles/data.parquet convert -to "csv"
 
 
     Example converting an excel file to CSV with `|` as delimiter. using the `-D` option:
 
 
-        csvcli -f "myfiles/data.xlsx" convert -to "csv" -D "|"
+        csvcli myfiles/data.xlsx convert -to "csv" -D "|"
 
     """
 
@@ -307,11 +305,11 @@ def change_delimiter(common_ctx, new_delimiter):
 
     Example changing the delimiter of a CSV file originally delimited by commas using the `-D` option:
 
-        csvcli -f "data.csv" change-delimiter -D "|"
+        csvcli data.csv change-delimiter -D "|"
 
     Example changing the delimiter of a CSV file with a delimiter other than commas. In this case you must also specify the old delimiter using the `-d` option:
 
-        csvcli -f "/Users/ignacio/Downloads/file.csv" -d ";" change-delimiter -D "|"
+        csvcli -d ";" data.csv change-delimiter -D "|"
 
     """
 
