@@ -29,6 +29,8 @@ def cli(common_ctx, filepath, delimiter):
 
     - Change the format: you can convert from and to CSV, excel and parquet in any combination. You can change the delimiter of your CSV file
 
+    Full documentation with examples: https://github.com/IgnacioMB/csvcli
+
     """
 
     common_ctx.obj = CommonContext(filepath, delimiter)
@@ -43,21 +45,7 @@ EXPLORE YOUR DATA
 @click.pass_context
 def show(common_ctx):
     """
-
     Displays the contents of the CSV, excel or parquet file.
-
-    Example showing the contents of a CSV file with the default delimiter:
-
-
-        csvcli csv_with_commas.csv show | less -S
-
-
-    Example showing the contents of a CSV file with a custom delimiter.
-    In this case you must specify the delimiter using the `-d` option:
-
-
-        csvcli -d '|' csv_with_pipes.csv show | less -S
-
     """
 
     display_df(df=common_ctx.obj.df)
@@ -68,17 +56,7 @@ def show(common_ctx):
 @click.option("-n", "--rowcount", type=int, default=5, help="(optional) Number of rows to show.")
 def head(common_ctx, rowcount):
     """
-
     Displays only the first rows of the file.
-
-    If you do not indicate any number, it returns the first 5 rows of the file:
-
-        csvcli csv_with_commas.csv head | less -S
-
-    You can specify a custom number of rows to show using the `-n` option:
-
-        csvcli csv_with_commas.csv head -n 100 | less -S
-
     """
     common_ctx.obj.df = filter_df(df=common_ctx.obj.df, head=True, n=rowcount).copy()
     display_df(df=common_ctx.obj.df)
@@ -88,12 +66,7 @@ def head(common_ctx, rowcount):
 @click.pass_context
 def columns(common_ctx):
     """
-
     Displays the column names and data types of the file.
-
-
-        csvcli myfiles/data.csv columns | less -S
-
     """
     display_df(get_dtypes(df=common_ctx.obj.df, pretty=True))
 
@@ -102,12 +75,7 @@ def columns(common_ctx):
 @click.pass_context
 def describe(common_ctx):
     """
-
-    Displays a table with summary statistics of the numerical columns.
-
-
-        csvcli myfiles/data.csv describe | less -S
-
+    Displays a table with summary statistics.
     """
 
     display_df(get_summary_stats(df=common_ctx.obj.df))
@@ -117,12 +85,7 @@ def describe(common_ctx):
 @click.pass_context
 def null_counts(common_ctx):
     """
-
     Displays the counts of null values per column.
-
-
-        csvcli myfiles/data.csv null-counts | less -S
-
     """
     display_df(get_null_columns(df=common_ctx.obj.df))
 
@@ -132,14 +95,7 @@ def null_counts(common_ctx):
 @click.option("-c", "--column", type=str, help="Name of column to count the unique values for")
 def value_counts(common_ctx, column):
     """
-
-    Displays the unique values in a column with their respective counts.
-    You must indicate a column using the `-c` option.
-
-    Example
-
-        csvcli myfiles/data.csv value-counts -c "Region" | less -S
-
+    Displays the unique values in a column
     """
     display_df(get_value_counts(df=common_ctx.obj.df, column=column))
 
@@ -158,30 +114,7 @@ FILTER AND QUERY
 def select(common_ctx, columns, sort_by, order, save_to):
 
     """
-
-    Allows you to display only a subset of columns.
-    Also supports sorting by a given column.
-
-    Example selecting columns from a CSV file:
-
-
-        csvcli myfiles/data.csv select -c "url, clicks, impressions" | less -S
-
-
-    Example selecting columns and sorting by one using the `-s` option.
-    You can add `ASC` for ascending order or `DESC` for descending order.
-    The default is ascending:
-
-
-        csvcli myfiles/data.csv select -c "url, clicks, impressions" -s "clicks" DESC | less -S
-
-
-    Example saving a selection result into an output file using the option `-save`:
-
-
-        csvcli myfiles/data.csv select -c "region, count" -save "subset.csv"
-
-
+    Allows you to display subsets of columns and sort.
     """
 
     common_ctx.obj.df = filter_df(df=common_ctx.obj.df, columns=columns, sort_by=sort_by, order=order).copy()
@@ -211,20 +144,7 @@ def select(common_ctx, columns, sort_by, order, save_to):
 def query(common_ctx, query, save_to):
 
     """
-
-    Allows you to query the CSV, excel or parquet file using SQL queries as you would any regular SQL table.
-    You specify the query using the `-q` option and use the keyword `file` to refer to your file as a source table.
-
-    Example running a query on a CSV file:
-
-        csvcli myfiles/data.csv query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;" | less -S
-
-
-    Example saving a query result into an output file using the option `-save`:
-
-        csvcli myfiles/data.csv query -q "SELECT Region,Units FROM file;" -save "query.csv"
-
-
+    Allows you to query the file using SQL queries.
     """
 
     common_ctx.obj.df = filter_df_by_query(df=common_ctx.obj.df, query=query).copy()
@@ -259,19 +179,7 @@ CHANGE THE FORMAT
 def convert(common_ctx, format, delimiter):
 
     """
-
-    Allows you to convert from and to CSV, excel and parquet in any combination. Your original file will be overwritten.
-
-    Example converting a parquet file to CSV:
-
-        csvcli myfiles/data.parquet convert -to "csv"
-
-
-    Example converting an excel file to CSV with `|` as delimiter. using the `-D` option:
-
-
-        csvcli myfiles/data.xlsx convert -to "csv" -D "|"
-
+    Allows you to convert to CSV, excel or parquet.
     """
 
     new_filepath = get_new_filepath(filepath=common_ctx.obj.filepath, desired_format=format)
@@ -298,17 +206,7 @@ def convert(common_ctx, format, delimiter):
 def change_delimiter(common_ctx, new_delimiter):
 
     """
-
-    Changes the delimiter of a CSV file. Your original file will be overwritten.
-
-    Example changing the delimiter of a CSV file originally delimited by commas using the `-D` option:
-
-        csvcli data.csv change-delimiter -D "|"
-
-    Example changing the delimiter of a CSV file with a delimiter other than commas. In this case you must also specify the old delimiter using the `-d` option:
-
-        csvcli -d ";" data.csv change-delimiter -D "|"
-
+    Changes the delimiter of a CSV file.
     """
 
     if get_file_extension(filepath=common_ctx.obj.filepath) == '.csv':
