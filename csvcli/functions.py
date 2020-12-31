@@ -165,7 +165,14 @@ def filter_df(df, head=False, n=None, columns=None, sort_by=None, ascending=True
     output_df = df.copy()
 
     if columns is not None:
+
         col_list = get_col_list(col_string=columns)
+
+        for col in col_list:
+            if col not in output_df.columns:
+                print(f"Ouch! Column '{col}' does not seem to be in your file...")
+                sys.exit(0)
+
         output_df = df[col_list].copy()
 
     if sort_by is not None:
