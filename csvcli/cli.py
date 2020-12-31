@@ -105,7 +105,7 @@ FILTER AND QUERY
 """
 
 
-@cli.command(no_args_is_help=True)
+@cli.command()
 @click.pass_context
 @click.option("-c", "--columns", type=str, help="Names of columns to show separated by commas")
 @click.option("-s", "--sort-by", type=str, help="Name of column to sort by")
