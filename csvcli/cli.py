@@ -48,7 +48,8 @@ def show(common_ctx):
     Displays the contents of the CSV, excel or parquet file.
     """
 
-    display_df(df=common_ctx.obj.df)
+    click.echo(f"\nFilename: {common_ctx.obj.filename+common_ctx.obj.file_extension} \nTotal number of rows: {common_ctx.obj.df.shape[0]}\n")
+    paginated_display(df=common_ctx.obj.df, filename=common_ctx.obj.filename+common_ctx.obj.file_extension, chunksize=5000)
 
 
 @cli.command()
@@ -58,6 +59,7 @@ def head(common_ctx, rowcount):
     """
     Displays only the first rows of the file.
     """
+    click.echo(f"\nFilename: {common_ctx.obj.filename + common_ctx.obj.file_extension} \nTotal number of rows: {common_ctx.obj.df.shape[0]}\n")
     common_ctx.obj.df = filter_df(df=common_ctx.obj.df, head=True, n=rowcount).copy()
     display_df(df=common_ctx.obj.df)
 
@@ -68,6 +70,7 @@ def columns(common_ctx):
     """
     Displays the column names and data types of the file.
     """
+    click.echo(f"\nFilename: {common_ctx.obj.filename + common_ctx.obj.file_extension} \nTotal number of rows: {common_ctx.obj.df.shape[0]}\n")
     display_df(get_dtypes(df=common_ctx.obj.df, pretty=True))
 
 
@@ -77,7 +80,7 @@ def describe(common_ctx):
     """
     Displays a table with summary statistics.
     """
-
+    click.echo(f"\nFilename: {common_ctx.obj.filename + common_ctx.obj.file_extension} \nTotal number of rows: {common_ctx.obj.df.shape[0]}\n")
     display_df(get_summary_stats(df=common_ctx.obj.df))
 
 
@@ -87,6 +90,7 @@ def null_counts(common_ctx):
     """
     Displays the counts of null values per column.
     """
+    click.echo(f"\nFilename: {common_ctx.obj.filename + common_ctx.obj.file_extension} \nTotal number of rows: {common_ctx.obj.df.shape[0]}\n")
     display_df(get_null_columns(df=common_ctx.obj.df))
 
 
@@ -97,6 +101,7 @@ def value_counts(common_ctx, column):
     """
     Displays the unique values in a column
     """
+    click.echo(f"\nFilename: {common_ctx.obj.filename + common_ctx.obj.file_extension} \nTotal number of rows: {common_ctx.obj.df.shape[0]}\n")
     display_df(get_value_counts(df=common_ctx.obj.df, column=column))
 
 

@@ -112,8 +112,8 @@ def delete_local_file(filepath):
     os.remove(filepath)
 
 
-def pd_tabulate(my_df):
-    return tabulate(my_df, headers='keys', tablefmt='fancy_grid')
+def pd_tabulate(my_df, headers='keys'):
+    return tabulate(my_df, headers=headers, tablefmt='fancy_grid')
 
 
 def get_col_list(col_string):
@@ -153,7 +153,7 @@ def read_file_to_df(filepath, delimiter=','):
     format = get_format_from_file_extension(file_extension=file_extension)
 
     if format == 'csv':
-        df = pd.read_csv(filepath, delimiter=delimiter)
+        df = pd.read_csv(filepath, delimiter=delimiter, engine='c')
 
     elif format == 'parquet':
         df = pd.read_parquet(filepath)
@@ -202,8 +202,26 @@ def filter_df(df, head=False, n=None, columns=None, sort_by=None, order='ASC'):
     return output_df
 
 
-def display_df(df):
-    click.echo(pd_tabulate(df))
+def display_df(df, headers='keys'):
+    click.echo(pd_tabulate(df, headers=headers))
+
+
+def paginated_display(df, filename, chunksize=25000):
+
+    page_count = df.shape[0] // chunksize
+    if df.shape[0] % chunksize != 0:
+        page_count += 1
+
+    offset = 0
+    limit = offset + chunksize
+
+    for page in range(1, page_count+1):
+
+        partial_df = df[offset:limit]
+        display_df(df=partial_df)
+        click.echo(f"\nFilename: {filename} - Total number of rows: {df.shape[0]}\n")
+        offset += chunksize
+        limit = offset + chunksize
 
 
 def get_dtype(series, pretty=False):
