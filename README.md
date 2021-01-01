@@ -33,8 +33,7 @@ Arguments
   - `FILEPATH` TEXT   Path to the file i.e. myfiles/data.csv. You might need to wrap it in "" if your filename contains parentheses and such.
 
 Options:
-  - `-d, --delimiter` TEXT  (optional) Only for CSV files. Delimiter if other than
-                        comma i.e. ';'. Must be a 1-character string.
+  - `-d, --delimiter` TEXT  (optional) Only for CSV files. If you want to override the automatic guess. Must be a 1-character string.
   
   - `--help `               Show this message and exit.
 
@@ -97,18 +96,20 @@ These commands allow you to quickly get a sense of what the contents of the file
 
 - `show`: Displays the contents of the CSV, excel or parquet file
   
-  Example showing the contents of a CSV file with `,` as a delimiter.
+  Example showing the contents of a CSV file.
 
   ```
   csvcli myfiles/data.csv show | less -S
   ```
 
-  Example showing the contents of a CSV file with a delimiter other than commas. 
-  In this case you must specify the delimiter using the `-d` option:
+  When working with CSV files, csvcli will try to guess the delimiter of your CSV files for you.
+  If you are not happy with the guess, you can always specify the delimiter using the `-d` option:
 
   ```
   csvcli -d '|' myfiles/csv_with_pipes.csv show | less -S
   ```
+  
+  
 
 - `head`: Displays only the first rows of the file
   
@@ -294,19 +295,13 @@ These commands allow you to quickly get a sense of what the contents of the file
   Your original file will be overwritten.
 
   Options:
-    - `-D, --new_delimiter` TEXT  Output CSV delimiter i.e. ';'. Must be a
+    - `-to, --new-delimiter` TEXT  Output CSV delimiter i.e. ';'. Must be a
                             1-character string.
-      
-  Example changing the delimiter of a CSV file originally delimited by commas using the `-D` option:
-
-  ```
-  csvcli data.csv change-delimiter -D "|"
-  ```
   
-  Example changing the delimiter of a CSV file with a delimiter other than commas. 
-  In this case you must also specify the old delimiter using the `-d` option:
+  Example changing the delimiter of a CSV file originally separated by ';' to '|':
+  
   ```
-  csvcli -d ";" data.csv change-delimiter -D "|"
+  csvcli -d ";" data.csv change-delimiter -to "|"
   ```
 
 ## Note about the author

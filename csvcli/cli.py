@@ -14,7 +14,7 @@ class CommonContext:
 @click.group()
 @click.pass_context
 @click.argument("filepath", type=str, required=True)
-@click.option("-d", "--delimiter", type=str, help="(optional) Only for CSV files. Delimiter if other than comma i.e. ';'. Must be a 1-character string.")
+@click.option("-d", "--delimiter", type=str, help="(optional) Only for CSV files. If you want to override the automatic guess. Must be a 1-character string.")
 def cli(common_ctx, filepath, delimiter):
     """
 
@@ -218,7 +218,7 @@ def convert(common_ctx, format, delimiter):
 
 @cli.command()
 @click.pass_context
-@click.option("-to", "--new_delimiter", type=str, help="Output delimiter if other than comma i.e. ';'. Must be a 1-character string.")
+@click.option("-to", "--new-delimiter", type=str, help="Output delimiter if other than comma i.e. ';'. Must be a 1-character string.")
 def change_delimiter(common_ctx, new_delimiter):
 
     """
