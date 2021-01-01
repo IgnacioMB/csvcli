@@ -35,16 +35,6 @@ def check_path(original_function):
     return wrapper
 
 
-def validate_delimiter(delimiter):
-    if not isinstance(delimiter, str):
-        click.echo("\nError! CSV delimiter must be a string")
-        sys.exit()
-
-    if not len(delimiter) == 1:
-        click.echo("\nError! CSV delimiter must be a 1-character string")
-        sys.exit()
-
-
 def validate_format(format):
     if not isinstance(format, str) or format not in['csv', 'excel', 'parquet']:
         click.echo("Ouch! Invalid format choice. You need to choose between 'csv', 'excel' or 'parquet'.")
@@ -79,13 +69,8 @@ def output_to_file(*args, **kwargs):
     :param filepath: path where the output file will be stored example '/Users/john/Downloads/mydir/myfile.csv'
     :param delimiter: (optional) csv delimiter if you want to output in csv with other than comma
     :param desired_format: has to be 'csv', 'excel' or 'parquet'
-    :return:
-    ------------------------------------------------------------------------
-    Code sample
-    ------------------------------------------------------------------------
-    format_change(filepath='/Users/john/Downloads/mydir/myfile.csv',
-                  delimiter=';',
-                  desired_format='excel')
+    :return: true if write operation went through, false otherwise
+
     """
 
     assert_param('df', **kwargs)
@@ -96,15 +81,33 @@ def output_to_file(*args, **kwargs):
 
     if kwargs['desired_format'] == 'csv':
         if 'delimiter' in kwargs.keys() and kwargs['delimiter'] is not None:
-            kwargs['df'].to_csv(kwargs['filepath'], sep=kwargs['delimiter'], index=False)
+            try:
+                kwargs['df'].to_csv(kwargs['filepath'], sep=kwargs['delimiter'], index=False)
+                return True
+            except Exception:
+                return False
         else:
-            kwargs['df'].to_csv(kwargs['filepath'], index=False)
+            try:
+                kwargs['df'].to_csv(kwargs['filepath'], index=False)
+                return True
+            except Exception:
+                return False
 
     elif kwargs['desired_format'] == 'excel':
-        kwargs['df'].to_excel(kwargs['filepath'], index=False)
+        try:
+            # pandas only supports writing on xlsx
+            excel_filename = get_filename(kwargs['filepath']) + '.xlsx'
+            kwargs['df'].to_excel(excel_filename, index=False)
+            return True
+        except Exception:
+            return False
 
     elif kwargs['desired_format'] == 'parquet':
-        kwargs['df'].to_parquet(kwargs['filepath'], index=False)
+        try:
+            kwargs['df'].to_parquet(kwargs['filepath'], index=False)
+            return True
+        except Exception:
+            return False
 
 
 @check_path
@@ -145,23 +148,76 @@ def get_format_from_file_extension(file_extension):
     return format
 
 
+def guess_delimiter(filepath):
+
+    for delim in [',', '\t', ';', '|']:
+        if is_valid_delimiter(delimiter=delim, filepath=filepath):
+            return delim
+
+    return None
+
+
+def is_valid_delimiter(delimiter, filepath):
+
+    if not len(delimiter) == 1:
+        click.echo("\nOuch! CSV delimiter must be a 1-character string")
+        sys.exit(0)
+
+    try:
+        df = pd.read_csv(filepath, delimiter=delimiter, engine='c')
+        if df.shape[1] > 1:
+            return True
+        else:
+            return False
+
+    except Exception:
+        try:
+            df = pd.read_csv(filepath, delimiter=delimiter, engine='python')
+            if df.shape[1] > 1:
+                return True
+            else:
+                return False
+
+        except Exception:
+            return False
+
+
 @check_path
-def read_file_to_df(filepath, delimiter=','):
+def read_file_to_df(filepath, delimiter):
 
     file_extension = get_file_extension(filepath=filepath)
 
     format = get_format_from_file_extension(file_extension=file_extension)
 
+    data = None
+
     if format == 'csv':
-        df = pd.read_csv(filepath, delimiter=delimiter, engine='c')
+        if delimiter is None:
+            click.echo(f"No delimiter given for '{filepath}'. Taking a guess...")
+            guessed_delimiter = guess_delimiter(filepath=filepath)
+
+            if guessed_delimiter is None:
+                click.echo(f"Ouch! None of our guesses worked, please input a delimiter")
+                sys.exit(0)
+            else:
+                click.echo(f"Voilà, '{guessed_delimiter}' seems to work.\n")
+                data = pd.read_csv(filepath, delimiter=guessed_delimiter)
+
+        else:
+            if is_valid_delimiter(delimiter=delimiter, filepath=filepath):
+                data = pd.read_csv(filepath, delimiter=delimiter)
+            else:
+                click.echo(f"Ouch! {filepath} does not seem to be delimited by {delimiter}")
+                sys.exit(0)
+
 
     elif format == 'parquet':
-        df = pd.read_parquet(filepath)
+        data = pd.read_parquet(filepath)
 
     elif format == 'excel':
-        df = pd.read_excel(filepath)
+        data = pd.read_excel(filepath)
 
-    return df
+    return data
 
 
 def assert_col_in_df(df, column):

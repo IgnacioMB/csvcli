@@ -14,7 +14,7 @@ class CommonContext:
 @click.group()
 @click.pass_context
 @click.argument("filepath", type=str, required=True)
-@click.option("-d", "--delimiter", type=str, default=",", help="(optional) Only for CSV files. Delimiter if other than comma i.e. ';'. Must be a 1-character string.")
+@click.option("-d", "--delimiter", type=str, help="(optional) Only for CSV files. Delimiter if other than comma i.e. ';'. Must be a 1-character string.")
 def cli(common_ctx, filepath, delimiter):
     """
 
@@ -135,11 +135,14 @@ def select(common_ctx, columns, sort_by, order, save_to):
         file_ext = get_file_extension(save_to)
         format = get_format_from_file_extension(file_extension=file_ext)
 
-        output_to_file(df=common_ctx.obj.df,
-                       filepath=save_to,
-                       desired_format=format)
+        success = output_to_file(df=common_ctx.obj.df,
+                                 filepath=save_to,
+                                 desired_format=format)
 
-        click.echo(f"successfully wrote select result into {save_to}")
+        if success:
+            click.echo(f"successfully exported your selection result into {save_to}")
+        else:
+            click.echo(f"Ouch! Something went wrong. We could not export your selection result")
 
 
 @cli.command()
@@ -156,7 +159,8 @@ def query(common_ctx, query, save_to):
 
     # we show result on screen if not save selected
     if save_to is None:
-
+        click.echo(f'\nQUERY: "{query}"')
+        click.echo(f"\nRESULT:\n")
         display_df(df=common_ctx.obj.df)
 
     # if save selected, do not show result on screen, just write to file and confirm
@@ -165,11 +169,15 @@ def query(common_ctx, query, save_to):
         file_ext = get_file_extension(save_to)
         format = get_format_from_file_extension(file_extension=file_ext)
 
-        output_to_file(df=common_ctx.obj.df,
-                       filepath=save_to,
-                       desired_format=format)
+        success = output_to_file(df=common_ctx.obj.df,
+                                 filepath=save_to,
+                                 desired_format=format)
 
-        click.echo(f"successfully wrote query result into {save_to}")
+        if success:
+            click.echo(f"successfully exported your query result into {save_to}")
+
+        else:
+            click.echo(f"Ouch! Something went wrong. We could not export your query result")
 
 
 """
@@ -192,14 +200,17 @@ def convert(common_ctx, format, delimiter):
     # if the new format is different from the original one
     if get_file_extension(filepath=new_filepath) != common_ctx.obj.file_extension:
 
-        output_to_file(df=common_ctx.obj.df,
-                       filepath=new_filepath,
-                       desired_format=format,
-                       delimiter=delimiter)
+        success = output_to_file(df=common_ctx.obj.df,
+                                 filepath=new_filepath,
+                                 desired_format=format,
+                                 delimiter=delimiter)
 
-        delete_local_file(filepath=common_ctx.obj.filepath)
+        if success:
+            delete_local_file(filepath=common_ctx.obj.filepath)
+            click.echo(f"successfully converted {common_ctx.obj.filepath} to '{format}'")
 
-        click.echo(f"successfully converted {common_ctx.obj.filepath} to '{format}'")
+        else:
+            click.echo(f"Ouch! Something went wrong. We could not convert your file")
 
     else:
         click.echo("Ouch! The original formal of the file and the new format you selected are identical")
@@ -207,7 +218,7 @@ def convert(common_ctx, format, delimiter):
 
 @cli.command()
 @click.pass_context
-@click.option("-D", "--new_delimiter", type=str, help="Output delimiter if other than comma i.e. ';'. Must be a 1-character string.")
+@click.option("-to", "--new_delimiter", type=str, help="Output delimiter if other than comma i.e. ';'. Must be a 1-character string.")
 def change_delimiter(common_ctx, new_delimiter):
 
     """
@@ -215,12 +226,27 @@ def change_delimiter(common_ctx, new_delimiter):
     """
 
     if get_file_extension(filepath=common_ctx.obj.filepath) == '.csv':
-        output_to_file(df=common_ctx.obj.df,
-                       filepath=common_ctx.obj.filepath,
-                       desired_format='csv',
-                       delimiter=new_delimiter)
 
-        click.echo(f"successfully changed CSV delimiter of {common_ctx.obj.filepath} to '{new_delimiter}'")
+        # create back up of original file
+        os.system(f"cp {common_ctx.obj.filepath} temp")
+
+        # attempt write op on file
+        success = output_to_file(df=common_ctx.obj.df,
+                                 filepath=common_ctx.obj.filepath,
+                                 desired_format='csv',
+                                 delimiter=new_delimiter)
+
+        # if write op went through, delete back up
+        if success:
+            os.remove("temp")
+            click.echo(f"successfully changed CSV delimiter of {common_ctx.obj.filepath} to '{new_delimiter}'")
+
+        # else restore original from back up
+        else:
+            os.system(f"cp temp {common_ctx.obj.filepath}")
+            os.remove("temp")
+            click.echo(f"Ouch! Something went wrong, try with a different delimiter")
+
 
     else:
         click.echo("Ouch! You can only change delimiter of CSV files")
