@@ -193,14 +193,14 @@ def read_file_to_df(filepath, delimiter):
 
     if format == 'csv':
         if delimiter is None:
-            click.echo(f"No delimiter given for '{filepath}'. Taking a guess...")
+            #click.echo(f"No delimiter given for '{filepath}'. Taking a guess...")
             guessed_delimiter = guess_delimiter(filepath=filepath)
 
             if guessed_delimiter is None:
-                click.echo(f"Ouch! None of our guesses worked, please input a delimiter")
+                click.echo(f"Ouch! We could not guess the delimited of {filepath}, please use the '-d' option input a delimiter")
                 sys.exit(0)
             else:
-                click.echo(f"Voilà, '{guessed_delimiter}' seems to work.\n")
+                #click.echo(f"Voilà, '{guessed_delimiter}' seems to work.\n")
                 data = pd.read_csv(filepath, delimiter=guessed_delimiter)
 
         else:
