@@ -183,33 +183,12 @@ def is_valid_delimiter(delimiter, filepath):
 
 
 @check_path
-def read_file_to_df(filepath, delimiter):
-
-    file_extension = get_file_extension(filepath=filepath)
-
-    format = get_format_from_file_extension(file_extension=file_extension)
+def read_file_to_df(filepath, format, delimiter):
 
     data = None
 
     if format == 'csv':
-        if delimiter is None:
-            #click.echo(f"No delimiter given for '{filepath}'. Taking a guess...")
-            guessed_delimiter = guess_delimiter(filepath=filepath)
-
-            if guessed_delimiter is None:
-                click.echo(f"Ouch! We could not guess the delimited of {filepath}, please use the '-d' option input a delimiter")
-                sys.exit(0)
-            else:
-                #click.echo(f"Voilà, '{guessed_delimiter}' seems to work.\n")
-                data = pd.read_csv(filepath, delimiter=guessed_delimiter)
-
-        else:
-            if is_valid_delimiter(delimiter=delimiter, filepath=filepath):
-                data = pd.read_csv(filepath, delimiter=delimiter)
-            else:
-                click.echo(f"Ouch! {filepath} does not seem to be delimited by {delimiter}")
-                sys.exit(0)
-
+        data = pd.read_csv(filepath, delimiter=delimiter)
 
     elif format == 'parquet':
         data = pd.read_parquet(filepath)
