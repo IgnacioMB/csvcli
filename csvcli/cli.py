@@ -54,7 +54,7 @@ def show(common_ctx):
 
 @cli.command()
 @click.pass_context
-@click.option("-n", "--rowcount", type=int, default=5, help="(optional) Number of rows to show.")
+@click.argument("rowcount", type=int, default=5, required=False)
 def head(common_ctx, rowcount):
     """
     Displays only the first rows of the file.

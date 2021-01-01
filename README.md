@@ -111,18 +111,16 @@ These commands allow you to quickly get a sense of what the contents of the file
   ```
 
 - `head`: Displays only the first rows of the file
-
-  Options:
-  - `-n, --rowcount` INTEGER  (optional) Number of rows to show.
   
   If you do not indicate any number, it returns the first 5 rows of the file:
   
   ```
   csvcli myfiles/data.csv head | less -S
   ```
-  You can specify a custom number of rows to show using the `-n` option:
+  
+  You can also specify a custom number of rows to show:
   ```
-  csvcli myfiles/data.csv head -n 100 | less -S
+  csvcli myfiles/data.csv head 100 | less -S
   ```
 
 - `columns`: Displays the column names and data types of the file
