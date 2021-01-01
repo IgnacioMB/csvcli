@@ -97,8 +97,7 @@ These commands allow you to quickly get a sense of what the contents of the file
 
 - `show`: Displays the contents of the CSV, excel or parquet file
   
-  Example showing the contents of a CSV file with `,` as a delimiter. 
-  You indicate the file you want to open using the `-f` option:
+  Example showing the contents of a CSV file with `,` as a delimiter.
 
   ```
   csvcli myfiles/data.csv show | less -S
