@@ -139,4 +139,4 @@ cython_debug/
 
 # test files
 **/**test.py
-tableize/
+.DS_Store
