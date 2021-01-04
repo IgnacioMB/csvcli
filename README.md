@@ -28,6 +28,18 @@ A simple command-line interface to work with CSV, excel and parquet files. You c
 ## Python version
 Built on and tested on python 3.7. Installation on 3.7 tested and working.
 
+## Installation
+### Using Pip
+```bash
+  $ pip install csvcli
+```
+### Manual
+```bash
+  $ git clone https://github.com/IgnacioMB/csvcli.git
+  $ cd csvcli
+  $ python setup.py install
+```
+
 ## Global parameters
 
 Usage: csvcli [OPTIONS] FILEPATH COMMAND [ARGS]...
