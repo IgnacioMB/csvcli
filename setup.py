@@ -39,7 +39,7 @@ setup(
   dependency_links=dependency_links,
   author_email='ignacio.marin@holidu.com',
   classifiers=[
-        "License :: OSI Approved :: GNU GPLv3",
+        "OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Programming Language :: Python :: 3.7",
     ]
 )
