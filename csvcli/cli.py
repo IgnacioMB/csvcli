@@ -12,6 +12,8 @@ class CommonContext:
         self.file_extension = get_file_extension(filepath=self.filepath)
         self.full_filename = self.filename + self.file_extension
         self.format = get_format_from_file_extension(file_extension=self.file_extension)
+        self.delimiter = None
+        self.is_delimiter_a_guess = None
 
         if self.format == 'csv':
 

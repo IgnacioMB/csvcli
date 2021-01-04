@@ -148,7 +148,8 @@ def display_meta_info(stdscr, full_filename, format, delimiter, is_delimiter_a_g
     return total_lines
 
 
-def display_full_table(stdscr, full_filename, format, is_delimiter_a_guess, delimiter, df, display_type, query=""):
+def display_full_table(stdscr, full_filename, format, df, display_type,
+                       query="", is_delimiter_a_guess=None, delimiter=None):
 
     curses.curs_set(0)
     h_offset = 0
