@@ -1,5 +1,7 @@
 import click
 from csvcli.functions import *
+from show.show import *
+import curses
 
 
 class CommonContext:
@@ -79,8 +81,13 @@ def show(common_ctx):
     """
     Displays the contents of the CSV, excel or parquet file.
     """
-    common_ctx.obj.display_info_header()
-    paginated_display(df=common_ctx.obj.df, filename=common_ctx.obj.full_filename, chunksize=5000)
+
+    curses.wrapper(display_full_table,
+                   full_filename=common_ctx.obj.full_filename,
+                   format=common_ctx.obj.format,
+                   is_delimiter_a_guess=common_ctx.obj.is_delimiter_a_guess,
+                   delimiter=common_ctx.obj.delimiter,
+                   df=common_ctx.obj.df, display_type="all")
 
 
 @cli.command()
@@ -90,9 +97,15 @@ def head(common_ctx, rowcount):
     """
     Displays only the first rows of the file.
     """
-    common_ctx.obj.display_info_header()
+
     common_ctx.obj.df = filter_df(df=common_ctx.obj.df, head=True, n=rowcount).copy()
-    display_df(df=common_ctx.obj.df)
+
+    curses.wrapper(display_full_table,
+                   full_filename=common_ctx.obj.full_filename,
+                   format=common_ctx.obj.format,
+                   is_delimiter_a_guess=common_ctx.obj.is_delimiter_a_guess,
+                   delimiter=common_ctx.obj.delimiter,
+                   df=common_ctx.obj.df, display_type="head")
 
 
 @cli.command()
@@ -101,8 +114,15 @@ def columns(common_ctx):
     """
     Displays the column names and data types of the file.
     """
-    common_ctx.obj.display_info_header()
-    display_df(get_dtypes(df=common_ctx.obj.df, pretty=True))
+
+    common_ctx.obj.df = get_dtypes(df=common_ctx.obj.df, pretty=True)
+
+    curses.wrapper(display_full_table,
+                   full_filename=common_ctx.obj.full_filename,
+                   format=common_ctx.obj.format,
+                   is_delimiter_a_guess=common_ctx.obj.is_delimiter_a_guess,
+                   delimiter=common_ctx.obj.delimiter,
+                   df=common_ctx.obj.df, display_type="columns")
 
 
 @cli.command()
@@ -111,8 +131,15 @@ def describe(common_ctx):
     """
     Displays a table with summary statistics.
     """
-    common_ctx.obj.display_info_header()
-    display_df(get_summary_stats(df=common_ctx.obj.df))
+
+    common_ctx.obj.df = get_summary_stats(df=common_ctx.obj.df)
+
+    curses.wrapper(display_full_table,
+                   full_filename=common_ctx.obj.full_filename,
+                   format=common_ctx.obj.format,
+                   is_delimiter_a_guess=common_ctx.obj.is_delimiter_a_guess,
+                   delimiter=common_ctx.obj.delimiter,
+                   df=common_ctx.obj.df, display_type="describe")
 
 
 @cli.command()
@@ -121,8 +148,18 @@ def null_counts(common_ctx):
     """
     Displays the counts of null values per column.
     """
-    common_ctx.obj.display_info_header()
-    display_df(get_null_columns(df=common_ctx.obj.df))
+
+    common_ctx.obj.df = get_null_columns(df=common_ctx.obj.df)
+
+    curses.wrapper(display_full_table,
+                   full_filename=common_ctx.obj.full_filename,
+                   format=common_ctx.obj.format,
+                   is_delimiter_a_guess=common_ctx.obj.is_delimiter_a_guess,
+                   delimiter=common_ctx.obj.delimiter,
+                   df=common_ctx.obj.df, display_type="null_counts")
+
+
+
 
 
 @cli.command()
@@ -132,8 +169,16 @@ def value_counts(common_ctx, column):
     """
     Displays the unique values in a column
     """
-    common_ctx.obj.display_info_header()
-    display_df(get_value_counts(df=common_ctx.obj.df, column=column))
+
+
+    common_ctx.obj.df = get_value_counts(df=common_ctx.obj.df, column=column)
+
+    curses.wrapper(display_full_table,
+                   full_filename=common_ctx.obj.full_filename,
+                   format=common_ctx.obj.format,
+                   is_delimiter_a_guess=common_ctx.obj.is_delimiter_a_guess,
+                   delimiter=common_ctx.obj.delimiter,
+                   df=common_ctx.obj.df, display_type="value_counts")
 
 
 """
@@ -158,7 +203,12 @@ def select(common_ctx, columns, sort_by, order, save_to):
     # we show result on screen if not save selected
     if save_to is None:
 
-        display_df(df=common_ctx.obj.df)
+        curses.wrapper(display_full_table,
+                       full_filename=common_ctx.obj.full_filename,
+                       format=common_ctx.obj.format,
+                       is_delimiter_a_guess=common_ctx.obj.is_delimiter_a_guess,
+                       delimiter=common_ctx.obj.delimiter,
+                       df=common_ctx.obj.df, display_type="select")
 
     # if save selected, do not show result on screen, just write to file and confirm
     else:
@@ -190,9 +240,13 @@ def query(common_ctx, query, save_to):
 
     # we show result on screen if not save selected
     if save_to is None:
-        click.echo(f'\nQUERY: "{query}"')
-        click.echo(f"\nRESULT:\n")
-        display_df(df=common_ctx.obj.df)
+
+        curses.wrapper(display_full_table,
+                       full_filename=common_ctx.obj.full_filename,
+                       format=common_ctx.obj.format,
+                       is_delimiter_a_guess=common_ctx.obj.is_delimiter_a_guess,
+                       delimiter=common_ctx.obj.delimiter,
+                       df=common_ctx.obj.df, display_type="query", query=query)
 
     # if save selected, do not show result on screen, just write to file and confirm
     else:
