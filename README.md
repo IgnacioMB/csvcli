@@ -8,6 +8,7 @@
      \/____/\/___/  \/__/            \/____/\/____/ \/_/
  
 ```
+
 ## Description 
 A simple command-line interface to work with CSV, excel and parquet files. You can use it to:
 - Explore your data: 
@@ -23,6 +24,9 @@ A simple command-line interface to work with CSV, excel and parquet files. You c
 - Change the format:
   - You can convert from and to CSV, excel and parquet in any combination
   - You can change the delimiter of your CSV file
+  
+## Python version
+Built on and tested on python 3.7. Installation on 3.7 tested and working.
 
 ## Global parameters
 
