@@ -37,7 +37,7 @@ setup(
  url='https://github.com/IgnacioMB/csvcli',
  download_url='https://github.com/IgnacioMB/csvcli/archive/main.tar.gz',
   dependency_links=dependency_links,
-  author_email='ignacio.marin',
+  author_email='ignacio.marin@holidu.com',
   classifiers=[
         "License :: OSI Approved :: GNU GPLv3",
         "Programming Language :: Python :: 3.7",
