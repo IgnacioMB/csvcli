@@ -36,26 +36,6 @@ Options:
   - `-d, --delimiter` TEXT  (optional) Only for CSV files. If you want to override the automatic guess. Must be a 1-character string.
   
   - `--help `               Show this message and exit.
-
-
-## Enhanced navigation with `less`
-
-It is strongly encouraged to pipe the output of any command of `csvcli` to `less -S`. 
-This will ensure that you can: 
-- Visualize correctly the contents of the entire file regardless of its dimensions
-  
-- Navigate through the file using the arrow keys to scroll left/right and up/down
-
-- Search for string patterns using `/pattern`
-  - While in search use `n` go to the next line of the file containing the pattern
-  - While in search use `N` go to the previous line of the file containing the pattern
-  
-- Quickly go to the beginning of the file using `g`
-- Quickly go to the end of the file using `G`
-
-For all these reasons all the examples provided here will include piping to `less -S`.
-
-Full documentation on less: https://man7.org/linux/man-pages/man1/less.1.html
   
     
 
@@ -99,14 +79,14 @@ These commands allow you to quickly get a sense of what the contents of the file
   Example showing the contents of a CSV file.
 
   ```
-  csvcli myfiles/data.csv show | less -S
+  csvcli myfiles/data.csv show
   ```
 
   When working with CSV files, csvcli will try to guess the delimiter of your CSV files for you.
   If you are not happy with the guess, you can always specify the delimiter using the `-d` option:
 
   ```
-  csvcli -d '|' myfiles/csv_with_pipes.csv show | less -S
+  csvcli -d '|' myfiles/csv_with_pipes.csv show
   ```
   
   
@@ -116,29 +96,29 @@ These commands allow you to quickly get a sense of what the contents of the file
   If you do not indicate any number, it returns the first 5 rows of the file:
   
   ```
-  csvcli myfiles/data.csv head | less -S
+  csvcli myfiles/data.csv head
   ```
   
   You can also specify a custom number of rows to show:
   ```
-  csvcli myfiles/data.csv head 100 | less -S
+  csvcli myfiles/data.csv head 100
   ```
 
-- `columns`: Displays the column names and data types of the file
+- `columns`: Displays the column names and data types
   
   ```
-  csvcli myfiles/data.csv columns | less -S
+  csvcli myfiles/data.csv columns
   ```
   
 - `describe`: Displays a table with summary statistics of the numerical columns
   
   ```
-  csvcli myfiles/data.csv describe | less -S
+  csvcli myfiles/data.csv describe
   ```
 - `null-counts`: Displays the counts of null values per column
   
   ```
-  csvcli myfiles/data.csv null-counts | less -S
+  csvcli myfiles/data.csv null-counts
   ```
   
 - `value-counts`: Displays the unique values in a column with their respective counts. 
@@ -150,7 +130,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   Example 
   
   ```
-  csvcli myfiles/data.csv value-counts -c "Region" | less -S
+  csvcli myfiles/data.csv value-counts -c "Region"
   ```
 
   
@@ -200,7 +180,7 @@ These commands allow you to quickly get a sense of what the contents of the file
    Example selecting columns from a CSV file:
 
    ```  
-   csvcli myfiles/data.csv select -c "url, clicks, impressions" | less -S
+   csvcli myfiles/data.csv select -c "url, clicks, impressions"
    ```    
   
    Example selecting columns and sorting by one using the `-s` option. 
@@ -208,7 +188,7 @@ These commands allow you to quickly get a sense of what the contents of the file
    The default is ascending:
    
    ```    
-   csvcli myfiles/data.csv select -c "url, clicks, impressions" -s "clicks" DESC | less -S
+   csvcli myfiles/data.csv select -c "url, clicks, impressions" -s "clicks" DESC
    ```
     
    Example saving a selection result into an output file using the option `-save`:
@@ -229,7 +209,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   Example running a query on a CSV file:
 
   ```
-  csvcli myfiles/data.csv query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;" | less -S
+  csvcli myfiles/data.csv query -q "SELECT Region,SUM(Units) FROM file GROUP BY Region;"
   ```
   
   Example saving a query result into an output file using the option `-save`:
