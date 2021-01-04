@@ -35,7 +35,7 @@ setup(
  long_description_content_type="text/markdown",
  license='GNU GPLv3',
  url='https://github.com/IgnacioMB/csvcli',
- download_url='https://github.com/IgnacioMB/csvcli',
+ download_url='https://github.com/IgnacioMB/csvcli/archive/main.tar.gz',
   dependency_links=dependency_links,
   author_email='ignacio.marin',
   classifiers=[

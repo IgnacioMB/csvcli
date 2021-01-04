@@ -8,6 +8,11 @@ class CommonContext:
 
     def __init__(self, filepath, delimiter):
         self.filepath = filepath
+
+        if not os.path.exists(self.filepath):
+            click.echo(f"\nOuch! Could not find '{self.filepath}'")
+            sys.exit()
+
         self.filename = get_filename(filepath=self.filepath)
         self.file_extension = get_file_extension(filepath=self.filepath)
         self.full_filename = self.filename + self.file_extension
