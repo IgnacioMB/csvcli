@@ -10,10 +10,11 @@
 ```
 
 ## Description 
-A simple command-line interface to work with CSV, excel and parquet files. You can use it to:
+A simple command-line tool to work with CSV, excel and parquet files. You can use it to:
 - Explore your data: 
   - navigate through the full contents of your tabular data fast and with a human-friendly format directly on the shell
   - quickly see which columns, data-types are in the file and how many null values or unique values are per column
+  - csvcli can handle and manipulate extremely large tabular data. There are no long loading times, regardless of the size of your file.
   
 - Filter and query: 
   - select subsets of the tabular data
@@ -24,6 +25,14 @@ A simple command-line interface to work with CSV, excel and parquet files. You c
 - Change the format:
   - You can convert from and to CSV, excel and parquet in any combination
   - You can change the delimiter of your CSV file
+  
+## Why?
+
+Browsing and filtering large CSV files and excel files in programs like Microsoft Excel can be slow and there are limitations to the amount of rows displayed.
+Apache Parquet files are a great alternative, but they require you to have some special tool to be able to browse them.
+Additionally, working with the command-line can help you streamline your work and avoid distractions.
+csvcli is a light weight tool that allows you to get insights from your data and run queries on them regardless of its size and format, directly from the command line.
+
   
 ## Python version
 Built on and tested on python 3.7. Installation on 3.7 tested and working.
@@ -183,11 +192,14 @@ These commands allow you to quickly get a sense of what the contents of the file
 
 - `select`: Allows you to display only a subset of columns. 
   Also supports sorting by a given column.
+  
+   Arguments:
+   - `ASC` TEXT  For ascending sorting
+  - `DESC` TEXT  For descending sorting
 
    Options:
    - `-c, --columns` TEXT         Names of columns to show separated by commas
    - `-s, --sort-by` TEXT         Name of column to sort by
-   - `-asc, --ascending` BOOLEAN  True for ascending and False for descending
    - `-save, --save-to` TEXT      Path to the destination file i.e.
                               'myfiles/data.csv'. The file extension determines
                               output format
@@ -210,7 +222,7 @@ These commands allow you to quickly get a sense of what the contents of the file
    Example saving a selection result into an output file using the option `-save`:
     
    ``` 
-   csvcli myfiles/data.csv select -c "region, count" -save "subset.csv"
+   csvcli myfiles/data.csv select -c "region, count" -save subset.csv
    ```
     
 - `query`: If you need more advanced filters and functions, the query command allows you to query the CSV, excel or parquet file using SQL queries as you would any regular SQL table. 
@@ -270,14 +282,14 @@ These commands allow you to quickly get a sense of what the contents of the file
   Your original file will be overwritten.
 
  Options:
-  - `-to, --format` TEXT    Output format. Options: 'csv', 'excel' or 'parquet'
+  - `-to, --format` TEXT    Output format. Options: `'csv', 'excel' or 'parquet'`
   - `-D, --delimiter` TEXT  (optional) Only for CSV files. Delimiter if other than
                         comma i.e. ';'. Must be a 1-character string.
     
   Example converting a parquet file to CSV:
 
   ```
-  csvcli myfiles/data.parquet convert -to "csv"
+  csvcli myfiles/data.parquet convert -to csv
   ```
 
   Example converting an excel file to CSV with `|` as delimiter. using the `-D` option:
