@@ -10,7 +10,8 @@
 ```
 
 ## Description 
-A simple command-line tool to work with CSV, excel and parquet files. You can use it to:
+A light-weight command-line tool to browse and query CSV, Excel and Apache Parquet files, regardless of their size. 
+You can use it to:
 - Explore your data: 
   - navigate through the full contents of your tabular data fast and with a human-friendly format directly on the shell
   - quickly see which columns, data-types are in the file and how many null values or unique values are per column
@@ -19,7 +20,7 @@ A simple command-line tool to work with CSV, excel and parquet files. You can us
 - Filter and query: 
   - select subsets of the tabular data
   - sort by a given column
-  - Need more? Ok then just run SQL queries on it!
+  - need more? Ok then just run SQL queries on it!
   - In all cases you can save the output to a new file
   
 - Change the format:
@@ -31,7 +32,7 @@ A simple command-line tool to work with CSV, excel and parquet files. You can us
 Browsing and filtering large CSV files and excel files in programs like Microsoft Excel can be slow and there are limitations to the amount of rows displayed.
 Apache Parquet files are a great alternative, but they require you to have some special tool to be able to browse them.
 Additionally, working with the command-line can help you streamline your work and avoid distractions.
-csvcli is a light weight tool that allows you to get insights from your data and run queries on them regardless of its size and format, directly from the command line.
+csvcli is a light-weight tool that allows you to get insights from your data and run queries on them regardless of its size and format, directly from the command line.
 
   
 ## Python version
