@@ -196,7 +196,7 @@ FILTER AND QUERY
 
 @cli.command()
 @click.pass_context
-@click.option("-c", "--columns", type=str, help="Names of columns to show separated by commas")
+@click.option("-c", "--columns", type=str, help="Names of selected columns to show separated by commas")
 @click.option("-s", "--sort-by", type=str, help="Name of column to sort by")
 @click.argument("order", type=str, default="ASC", required=False)
 @click.option("-save", "--save-to", type=str, help="Path to the destination file i.e. 'myfiles/data.csv'. The file extension determines output format")

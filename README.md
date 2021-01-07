@@ -13,14 +13,14 @@
 A light-weight command-line tool to browse and query CSV, Excel and Apache Parquet files, regardless of their size. 
 You can use it to:
 - Explore your data: 
-  - navigate through the full contents of your tabular data fast and with a human-friendly format directly on the shell
-  - quickly see which columns, data-types are in the file and how many null values or unique values are per column
+  - Navigate through the full contents of your tabular data fast and with a human-friendly format directly on the shell
+  - Quickly see which columns, data-types are in the file and how many null values or unique values are per column
   - csvcli can handle and manipulate extremely large tabular data. There are no long loading times, regardless of the size of your file.
   
 - Filter and query: 
-  - select subsets of the tabular data
-  - sort by a given column
-  - need more? Ok then just run SQL queries on it!
+  - Select subsets of the tabular data
+  - Sort by a given column
+  - Need more? Ok then just run SQL queries on it!
   - In all cases you can save the output to a new file
   
 - Change the format:
@@ -100,7 +100,7 @@ Options:
 
 These commands allow you to quickly get a sense of what the contents of the file look like.
 
-- `show`: Displays the contents of the CSV, excel or parquet file
+- `show`: Displays the full contents of the CSV, Excel or Apache Parquet file. If it does not fit onscreen, you can use the arrow keys to scroll through the rows or columns.
   
   Example showing the contents of a CSV file.
 
@@ -108,7 +108,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   csvcli myfiles/data.csv show
   ```
 
-  When working with CSV files, csvcli will try to guess the delimiter of your CSV files for you.
+  While working with CSV files, csvcli will try to guess the delimiter of your CSV files for you.
   If you are not happy with the guess, you can always specify the delimiter using the `-d` option:
 
   ```
@@ -199,7 +199,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   - `DESC` TEXT  For descending sorting
 
    Options:
-   - `-c, --columns` TEXT         Names of columns to show separated by commas
+   - `-c, --columns` TEXT         Names of selected columns to show separated by commas
    - `-s, --sort-by` TEXT         Name of column to sort by
    - `-save, --save-to` TEXT      Path to the destination file i.e.
                               'myfiles/data.csv'. The file extension determines
@@ -226,8 +226,8 @@ These commands allow you to quickly get a sense of what the contents of the file
    csvcli myfiles/data.csv select -c "region, count" -save subset.csv
    ```
     
-- `query`: If you need more advanced filters and functions, the query command allows you to query the CSV, excel or parquet file using SQL queries as you would any regular SQL table. 
-  You specify the query using the `-q` option and use the keyword `file` to refer to your file as a source table.
+- `query`: If you need more advanced filters and functions, the query command allows you to query the CSV, Excel or Apache Parquet file using SQL queries as you would any regular SQL table. 
+  You specify the query using the `-q` option and use the keyword `file` to refer to your file as a source table. Uses [SQLite](https://www.sqlite.org/lang.html) syntax.
   
   Options:
   - `-q, --query` TEXT  SQL query you want to run against the file i.e. `SELECT * FROM file;`
@@ -279,7 +279,7 @@ These commands allow you to quickly get a sense of what the contents of the file
 ```
 
 
-- `convert`: Allows you to convert from and to CSV, excel and parquet in any combination. 
+- `convert`: Allows you to convert from and to CSV, Excel and Apache Parquet in any combination. 
   Your original file will be overwritten.
 
  Options:
@@ -293,7 +293,7 @@ These commands allow you to quickly get a sense of what the contents of the file
   csvcli myfiles/data.parquet convert -to csv
   ```
 
-  Example converting an excel file to CSV with `|` as delimiter. using the `-D` option:
+  Example converting an Excel file to CSV with `|` as delimiter. using the `-D` option:
 
   ```
   csvcli myfiles/data.xlsx convert -to "csv" -D "|"
@@ -307,7 +307,7 @@ These commands allow you to quickly get a sense of what the contents of the file
     - `-to, --new-delimiter` TEXT  Output CSV delimiter i.e. ';'. Must be a
                             1-character string.
   
-  Example changing the delimiter of a CSV file originally separated by ';' to '|':
+  Example changing the delimiter of a CSV file from ';' to '|':
   
   ```
   csvcli -d ";" data.csv change-delimiter -to "|"
