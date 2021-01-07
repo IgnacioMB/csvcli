@@ -176,7 +176,6 @@ def display_full_table(stdscr, full_filename, format, df, display_type,
         stdscr.addstr(h_padding, 0, partial_table_str)
         stdscr.refresh()
         key = stdscr.get_wch()
-        #raise AssertionError(f"{row_count} ")
 
         if key == curses.KEY_DOWN and (h_offset + 1) <= (df.shape[0] - row_count):
             h_offset += 1
@@ -190,7 +189,13 @@ def display_full_table(stdscr, full_filename, format, df, display_type,
         if key == curses.KEY_RIGHT and w_offset+w_step < tw-1:
             w_offset += w_step
 
-        if key == 'q':
+        if key == 'a' or key == 'A':
+            h_offset = 0
+
+        if key == 'z' or key == 'Z':
+            h_offset = df.shape[0] - row_count
+
+        if key == 'q' or key == 'Q':
             break
 
         resize = curses.is_term_resized(sh, sw)

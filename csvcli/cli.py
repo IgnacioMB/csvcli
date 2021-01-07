@@ -26,7 +26,7 @@ class CommonContext:
                 guessed_delimiter = guess_delimiter(filepath=filepath)
 
                 if guessed_delimiter is None:
-                    click.echo(f"Ouch! We could not guess the delimited of {filepath}, please use the '-d' option input a delimiter")
+                    click.echo(f"Ouch! We could not guess the delimiter of {filepath}, please use the '-d' option input a delimiter")
                     sys.exit(0)
                 else:
                     self.is_delimiter_a_guess = True
@@ -53,7 +53,7 @@ class CommonContext:
 
 
 @click.group()
-@click.version_option("1.0.1")
+@click.version_option("1.0.2")
 @click.pass_context
 @click.argument("filepath", type=str, required=True)
 @click.option("-d", "--delimiter", type=str, help="(optional) Only for CSV files. If you want to override the automatic guess. Must be a 1-character string.")
@@ -87,7 +87,7 @@ EXPLORE YOUR DATA
 @click.pass_context
 def show(common_ctx):
     """
-    Displays the contents of the CSV, excel or parquet file.
+    Displays the full contents of the CSV, Excel or Apache Parquet file.
     """
 
     curses.wrapper(display_full_table,
@@ -178,6 +178,13 @@ def value_counts(common_ctx, column):
     Displays the unique values in a column
     """
 
+    if column is None:
+        click.echo("Ouch! You forgot to indicate the column. Please use the -c option to do so")
+        sys.exit(0)
+
+    elif column not in common_ctx.obj.df.columns:
+        click.echo(f"Ouch! The column '{column}' does not seem to be present in '{common_ctx.obj.filepath}'")
+        sys.exit(0)
 
     common_ctx.obj.df = get_value_counts(df=common_ctx.obj.df, column=column)
 
@@ -196,7 +203,7 @@ FILTER AND QUERY
 
 @cli.command()
 @click.pass_context
-@click.option("-c", "--columns", type=str, help="Names of columns to show separated by commas")
+@click.option("-c", "--columns", type=str, help="Names of selected columns to show separated by commas")
 @click.option("-s", "--sort-by", type=str, help="Name of column to sort by")
 @click.argument("order", type=str, default="ASC", required=False)
 @click.option("-save", "--save-to", type=str, help="Path to the destination file i.e. 'myfiles/data.csv'. The file extension determines output format")
@@ -205,6 +212,10 @@ def select(common_ctx, columns, sort_by, order, save_to):
     """
     Allows you to display subsets of columns and sort.
     """
+
+    if columns is None:
+        click.echo("Ouch! You forgot to indicate the columns, Please use the -c option to do so")
+        sys.exit(0)
 
     common_ctx.obj.df = filter_df(df=common_ctx.obj.df, columns=columns, sort_by=sort_by, order=order).copy()
 
@@ -285,7 +296,7 @@ CHANGE THE FORMAT
 def convert(common_ctx, format, delimiter):
 
     """
-    Allows you to convert to CSV, excel or parquet.
+    Allows you to convert to CSV, Excel or Apache Parquet.
     """
 
     new_filepath = get_new_filepath(filepath=common_ctx.obj.filepath, desired_format=format)

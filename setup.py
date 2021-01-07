@@ -20,8 +20,8 @@ dependency_links = [x.strip().replace('git+', '') for x in all_reqs \
 
 setup(
  name='csvcli',
- description ='A simple command-line interface to work with CSV, excel and parquet files',
- version = '1.0.1',
+ description ='A light-weight command-line tool to browse and query CSV, Excel and Apache Parquet files, regardless of their size.',
+ version = '1.0.2',
  packages=find_packages(), # list of all packages
  install_requires=install_requires,
  python_requires='>=3.7', # any python greater than 3.7
