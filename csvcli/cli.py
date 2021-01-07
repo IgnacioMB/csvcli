@@ -87,7 +87,7 @@ EXPLORE YOUR DATA
 @click.pass_context
 def show(common_ctx):
     """
-    Displays the contents of the CSV, excel or parquet file.
+    Displays the full contents of the CSV, Excel or Apache Parquet file.
     """
 
     curses.wrapper(display_full_table,
@@ -178,6 +178,13 @@ def value_counts(common_ctx, column):
     Displays the unique values in a column
     """
 
+    if column is None:
+        click.echo("Ouch! You forgot to indicate the column. Please use the -c option to do so")
+        sys.exit(0)
+
+    elif column not in common_ctx.obj.df.columns:
+        click.echo(f"Ouch! The column '{column}' does not seem to be present in '{common_ctx.obj.filepath}'")
+        sys.exit(0)
 
     common_ctx.obj.df = get_value_counts(df=common_ctx.obj.df, column=column)
 
@@ -205,6 +212,10 @@ def select(common_ctx, columns, sort_by, order, save_to):
     """
     Allows you to display subsets of columns and sort.
     """
+
+    if columns is None:
+        click.echo("Ouch! You forgot to indicate the columns, Please use the -c option to do so")
+        sys.exit(0)
 
     common_ctx.obj.df = filter_df(df=common_ctx.obj.df, columns=columns, sort_by=sort_by, order=order).copy()
 
@@ -285,7 +296,7 @@ CHANGE THE FORMAT
 def convert(common_ctx, format, delimiter):
 
     """
-    Allows you to convert to CSV, excel or parquet.
+    Allows you to convert to CSV, Excel or Apache Parquet.
     """
 
     new_filepath = get_new_filepath(filepath=common_ctx.obj.filepath, desired_format=format)
