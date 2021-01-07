@@ -53,7 +53,7 @@ class CommonContext:
 
 
 @click.group()
-@click.version_option("1.0.1")
+@click.version_option("1.0.2")
 @click.pass_context
 @click.argument("filepath", type=str, required=True)
 @click.option("-d", "--delimiter", type=str, help="(optional) Only for CSV files. If you want to override the automatic guess. Must be a 1-character string.")

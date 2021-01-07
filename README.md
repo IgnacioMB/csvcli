@@ -100,7 +100,13 @@ Options:
 
 These commands allow you to quickly get a sense of what the contents of the file look like.
 
-- `show`: Displays the full contents of the CSV, Excel or Apache Parquet file. If it does not fit onscreen, you can use the arrow keys to scroll through the rows or columns.
+- `show`: Displays the full contents of the CSV, Excel or Apache Parquet file. 
+  
+  Navigation:
+  - Use the arrow keys to scroll through the rows or columns
+  - Press 'z' to go to the end of the file
+  - Press 'a' to go the beginning of the file
+  - Press 'q' to quit
   
   Example showing the contents of a CSV file.
 
