@@ -26,7 +26,7 @@ class CommonContext:
                 guessed_delimiter = guess_delimiter(filepath=filepath)
 
                 if guessed_delimiter is None:
-                    click.echo(f"Ouch! We could not guess the delimited of {filepath}, please use the '-d' option input a delimiter")
+                    click.echo(f"Ouch! We could not guess the delimiter of {filepath}, please use the '-d' option input a delimiter")
                     sys.exit(0)
                 else:
                     self.is_delimiter_a_guess = True
