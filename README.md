@@ -24,19 +24,19 @@ You can use it to:
   - In all cases you can save the output to a new file
   
 - Change the format:
-  - You can convert from and to CSV, excel and parquet in any combination
-  - You can change the delimiter of your CSV file
+  - You can convert from and to CSV, Excel and Apache Parquet in any combination
+  - You can also change the delimiter of your CSV file
   
 ## Why?
 
-Browsing and filtering large CSV files and excel files in programs like Microsoft Excel can be slow and there are limitations to the amount of rows displayed.
-Apache Parquet files are a great alternative, but they require you to have some special tool to be able to browse them.
+Browsing and filtering large CSV files and Excel files in programs like Microsoft Excel or Pages can be slow and there are limitations to the amount of rows displayed.
+Apache Parquet files cannot even be opened by these programs.
 Additionally, working with the command-line can help you streamline your work and avoid distractions.
-csvcli is a light-weight tool that allows you to get insights from your data and run queries on them regardless of its size and format, directly from the command line.
+csvcli allows you to get insights from your data and run queries on them regardless of its size and format, directly from the command line.
 
   
 ## Python version
-Built on and tested on python 3.7. Installation on 3.7 tested and working.
+Built on and tested on python 3.7
 
 ## Installation
 ### Using Pip
